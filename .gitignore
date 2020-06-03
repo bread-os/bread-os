@@ -1,4 +1,6 @@
+# output dirs
 cmake-build-debug
+out
 
 # nasm output bin
 *.bin
