@@ -26,7 +26,8 @@ module.exports = () => {
       '-o',
       ...boot.map(item => 'out/kernel.bin'),
       '-l', // todo: user can trigger if generate .lst files
-      ...boot.map(item => 'out/kernel.lst')
+      ...boot.map(item => 'out/kernel.lst'),
+      '-f', 'bin'
     ],
     {
       cwd: process.cwd(),
