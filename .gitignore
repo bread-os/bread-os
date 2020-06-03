@@ -1,1 +1,6 @@
 cmake-build-debug
+
+# nasm output bin
+*.bin
+# nasm list file
+*.lst
