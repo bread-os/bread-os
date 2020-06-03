@@ -11,5 +11,6 @@ program
     process.env.DEBUG = true
   })
   .option('--build-kernel', 'build kernel', require('./scripts/build-kernel'))
+  .option('--clean', 'clean output', require('./scripts/clean'))
 
 program.parse(process.argv)
