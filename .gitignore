@@ -4,3 +4,8 @@ cmake-build-debug
 *.bin
 # nasm list file
 *.lst
+
+# node
+node_modules
+yarn.lock
+package-lock.json
