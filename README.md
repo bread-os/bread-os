@@ -19,3 +19,7 @@ Please **add** them to environment variables
 ```sh
 sh build.bash --help
 ```
+
+## LICENSE
+
+[MIT LICENSE](LICENSE)
