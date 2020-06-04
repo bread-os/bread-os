@@ -27,5 +27,7 @@ jobs:
           yarn lint
         env:
           CI: true
+      - name: Install Requirement
+        run: sudo apt install nasm gcc g++
       - name: Build Kernel
         run: sh build.bash --build-kernel
