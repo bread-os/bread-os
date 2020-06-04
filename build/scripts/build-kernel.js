@@ -1,6 +1,6 @@
 const assert = require('assert')
 const { spawnSync } = require('child_process')
-const { resolve, basename } = require('path')
+const { resolve, basename, extname } = require('path')
 const { statSync, mkdirSync, rmdirSync, existsSync } = require('fs')
 const data = require('../data')
 
@@ -21,7 +21,7 @@ module.exports = () => {
     mkdirSync(outputDir)
   }
   for (const bootFile of boot) {
-    const filename = basename(bootFile)
+    const filename = basename(bootFile, extname(bootFile))
     // fixme: use spawn instead of spawnSync?
     const cp = spawnSync('nasm', [
       `${boot}`,
