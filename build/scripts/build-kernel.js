@@ -1,5 +1,6 @@
-const { spawn } = require('child_process')
-const { resolve } = require('path')
+const assert = require('assert')
+const { spawnSync } = require('child_process')
+const { resolve, basename } = require('path')
 const { statSync, mkdirSync, rmdirSync, existsSync } = require('fs')
 const data = require('../data')
 
@@ -19,23 +20,18 @@ module.exports = () => {
   } else {
     mkdirSync(outputDir)
   }
-  // fixme: error handle
-  // fixme: multi input
-  const cp = spawn(
-    'nasm',
-    [
+  for (const bootFile of boot) {
+    const filename = basename(bootFile)
+    // fixme: use spawn instead of spawnSync?
+    const cp = spawnSync('nasm', [
       `${boot}`,
       '-o',
-      'out/kernel.bin',
+      `out/${filename}.bin`,
       '-l', // todo: user can trigger if generate .lst files
-      'out/kernel.lst',
+      `out/${filename}.lst`,
       '-f', 'bin'
-    ],
-    {
-      cwd: process.cwd(),
-      env: process.env
-    }
-  )
-  cp.on('error', console.error)
+    ])
+    assert.ifError(cp.error)
+  }
   console.log('build kernel: done')
 }
