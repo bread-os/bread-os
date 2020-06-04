@@ -19,14 +19,16 @@ module.exports = () => {
   } else {
     mkdirSync(outputDir)
   }
+  // fixme: error handle
+  // fixme: multi input
   const cp = spawn(
     'nasm',
     [
-      ...boot.map(item => item),
+      `${boot}`,
       '-o',
-      ...boot.map(item => 'out/kernel.bin'),
+      'out/kernel.bin',
       '-l', // todo: user can trigger if generate .lst files
-      ...boot.map(item => 'out/kernel.lst'),
+      'out/kernel.lst',
       '-f', 'bin'
     ],
     {
