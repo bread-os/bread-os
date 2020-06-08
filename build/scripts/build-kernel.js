@@ -3,26 +3,30 @@ const { spawnSync } = require('child_process')
 const { basename, extname } = require('path')
 const data = require('../data')
 
+const exitIfString = (str) => {
+  if (str) {
+    console.error(str)
+    process.exit(1)
+  }
+}
+
 module.exports = () => {
   console.log('build kernel: start')
   const { boot } = data
-  for (const bootFile of boot) {
+  for (const { entry: bootFile, format } of boot) {
     const filename = basename(bootFile, extname(bootFile))
     // fixme: use spawn instead of spawnSync?
     const cp = spawnSync('nasm', [
-      `${boot}`,
+      `${bootFile}`,
       '-o',
       `out/${filename}.bin`,
       '-l', // todo: user can trigger if generate .lst files
       `out/${filename}.lst`,
-      '-f', 'bin'
+      '-f', format
     ])
     assert.ifError(cp.error)
-    if (cp.stdout.toString('utf-8').trim() !== '') {
-      // todo: abstract this scope
-      console.error(cp.stdout.trim().toString('utf-8'))
-      process.exit(1)
-    }
+    exitIfString(cp.stderr.toString('utf-8').trim())
+    exitIfString(cp.stdout.toString('utf-8').trim())
   }
   console.log('build kernel: done')
 }
