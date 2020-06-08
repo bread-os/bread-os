@@ -18,6 +18,8 @@ Please **add** them to environment variables
 
 ```sh
 sh build.bash --help
+# run
+qemu-system-x86_64 out/boot.bin
 ```
 
 ## LICENSE
