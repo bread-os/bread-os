@@ -32,6 +32,11 @@ module.exports = () => {
       '-f', 'bin'
     ])
     assert.ifError(cp.error)
+    if (cp.stdout.toString('utf-8').trim() !== '') {
+      // todo: abstract this scope
+      console.error(cp.stdout.trim().toString('utf-8'))
+      process.exit(1)
+    }
   }
   console.log('build kernel: done')
 }
