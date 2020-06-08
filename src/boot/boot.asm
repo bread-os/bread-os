@@ -1,134 +1,63 @@
-app_start equ 100
+bits 16
+org 0x7c00
 
-SECTION mbr align=16 vstart=0x7c00
-start:
-    cli ; turn on CPU interrupt
+boot:
+	mov ax, 0x2401
+	int 0x15
+	mov ax, 0x3
+	int 0x10
+	cli
+	lgdt [gdt_pointer]
+	mov eax, cr0
+	or eax,0x1
+	mov cr0, eax
+	jmp CODE_SEG:boot2
+gdt_start:
+	dq 0x0
+gdt_code:
+	dw 0xFFFF
+	dw 0x0
+	db 0x0
+	db 10011010b
+	db 11001111b
+	db 0x0
+gdt_data:
+	dw 0xFFFF
+	dw 0x0
+	db 0x0
+	db 10010010b
+	db 11001111b
+	db 0x0
+gdt_end:
+gdt_pointer:
+	dw gdt_end - gdt_start
+	dd gdt_start
 
-    mov ax, 0
-    mov ss, ax
-    mov sp, ax
+CODE_SEG equ gdt_code - gdt_start
+DATA_SEG equ gdt_data - gdt_start
 
-    mov ax, [cs:phy_base]
-    mov dx, [cs:phy_base + 0x02]
-    mov bx, 16
-    div bx
-    mov ds, ax
-    mov es, ax
+bits 32
+boot2:
+	mov ax, DATA_SEG
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
+	mov esi,hello
+	mov ebx,0xb8000
+.loop:
+	lodsb
+	or al,al
+	jz halt
+	or eax,0x0100
+	mov word [ebx], ax
+	add ebx,2
+	jmp .loop
+halt:
+	cli
+	hlt
+hello: db "Hello world!",0
 
-    xor di, di
-    mov si, app_start
-    xor bx, bx
-    call read_hard_disk_0
-
-    mov dx, [2]
-    mov ax, [0]
-    mov bx, 512
-    div bx
-    cmp dx, 0
-    jnz @1
-    dec ax
-@1:
-    cmp ax, 0
-    jz direct
-
-    push ds
-    mov cx, ax
-@2:
-    mov ax, ds
-    add ax, 0x20
-    mov ds, ax
-    
-    xor bx, bx
-    inc si
-    call read_hard_disk_0
-    loop @2
-
-    pop ds  ; restore data
-
-direct:
-    mov dx, [0x08]
-    mov ax, [0x06]
-    call calc_segment_base
-    mov [0x06], ax
-    
-    mov cx, [0x0a]
-    mov bx, 0x0c
-
-realloc:
-    mov dx, [bx + 0x02]
-    mov ax, [bx]
-    call calc_segment_base
-    mov [bx], ax
-    add bx, 4
-    loop realloc
-
-    jmp far [0x04]
-
-read_hard_disk_0:
-    push ax
-    push bx
-    push cx
-    push dx
-
-    mov dx, 0x1f2
-    mov al, 1
-    out dx, al
-
-    inc dx  ;0x1f3             
-    mov ax, si
-    out dx, al
-
-    inc dx  ;0x1f4
-    mov al, ah
-    out dx, al
-
-    inc dx  ;0x1f5
-    mov ax, di
-    out dx, al
-
-    inc dx  ;0x1f6
-    mov al, 0xe0
-    or al, ah
-    out dx, al
-
-    inc dx  ;0x1f7
-    mov al, 0x20    ; READ commands
-    out dx, al
-
-.waits:
-    in al, dx
-    and al, 0x88
-    cmp al, 0x88
-    jnz .waits  ; waiting for disk ok
-
-.readw:
-    in ax, dx
-    mov [bx], ax
-    add bx, 2
-    loop .readw
-
-    pop dx
-    pop cx
-    pop bx
-    pop ax
-    ret
-
-calc_segment_base:
-    ; calculate 16 bit segment address
-    ; input: DX:AX = 32 bit physical address
-    ; return: AX = 16 bit segment base address
-    push dx
-
-    add ax, [cs: phy_base]
-    adc dx, [cs: phy_base + 0x02]
-    shr ax, 4
-    ror dx, 4
-    and dx, 0xf000
-    or ax, dx   ; return ax
-
-    pop dx
-
-    ret
-
-SECTION .data
-    phy_base dd 0x10000 ; user program start address
+times 510 - ($-$$) db 0
+dw 0xaa55
