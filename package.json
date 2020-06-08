@@ -5,7 +5,8 @@
   "author": "himself65 <himself65@outlook.com>",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build": "sh build.bash --build-kernel"
   },
   "devDependencies": {
     "@types/node": "^14.0.11",

@@ -1,5 +1,5 @@
 module.exports = {
   boot: [
-    { entry: 'src/boot/boot.asm', format: 'elf32' }
+    { entry: 'src/boot/boot.asm', format: 'elf64' }
   ]
 }

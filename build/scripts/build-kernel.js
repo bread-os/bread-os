@@ -30,3 +30,10 @@ module.exports = () => {
   }
   console.log('build kernel: done')
 }
+
+/***
+ * todo:
+ *  - support linker
+ *      g++ -m64 src/boot/boot.cpp out/boot.bin -o kernel.bin -nostdlib -ffreestanding -std=c++11 -mno-red-zone
+ *          -fno-exceptions -nostdlib -fno-rtti -Wall -Wextra -Werror -T src/boot/linker.ld
+ */
