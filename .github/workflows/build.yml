@@ -29,5 +29,7 @@ jobs:
           CI: true
       - name: Install Requirement
         run: sudo apt install nasm gcc g++
-      - name: Build Kernel
-        run: sh build.bash --build-kernel
+      - name: Build Kernel(production)
+        run: yarn build
+      - name: Build Kernel(debug)
+        run: NODE_ENV=debug yarn build
