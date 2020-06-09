@@ -4,6 +4,7 @@ const { resolve } = require('path')
 const cwd = process.cwd()
 const outputDir = resolve(cwd, 'out')
 
+// tip: lazy load outputDirStat
 let outputDirStat
 const lazyLoadOutputDirStat = () => {
   if (!outputDirStat) {
@@ -25,4 +26,20 @@ exports.checkDependenciesExists = () => {
   } else {
     mkdirSync(outputDir)
   }
+}
+
+let config = null
+/**
+ *
+ * @param filename {string}
+ * @return {object}
+ */
+exports.getConfig = (filename = 'make.config.js') => {
+  if (config) return config
+  try {
+    config = require(resolve(cwd, filename))
+  } catch (_) {
+    config = {}
+  }
+  return config
 }

@@ -6,17 +6,22 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint .",
-    "build": "sh build.bash --build-kernel"
+    "start": "sh build.bash",
+    "build": "sh build.bash --build-kernel",
+    "clean": "sh build.bash --clean"
   },
   "devDependencies": {
     "@types/node": "^14.0.11",
     "commander": "^5.1.0",
-    "dotenv": "^8.2.0",
     "eslint": "^7.1.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1"
+  },
+  "dependencies": {
+    "@types/signale": "^1.4.1",
+    "signale": "^1.4.0"
   }
 }
