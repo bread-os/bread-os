@@ -13,7 +13,7 @@ module.exports = (debug = true) => {
   e.KERNEL_OUTPUT = `${e.OUTPUT_DIR}/kernel.bin`
   e.KERNEL_BUILD_ARGS =
     `${e.CXX_FLAGS} ` +
-    `${debug ? '-g' : ''} ${e.BOOTLOADER_FILE} ${e.BOOTLOADER_OUTPUT} ` +
+    `${debug ? '-g ' : ''}${e.BOOTLOADER_FILE} ${e.BOOTLOADER_OUTPUT} ` +
     `-o ${e.KERNEL_OUTPUT} ` +
     `-T ${e.LINK_FILE}`
   return e
