@@ -42,6 +42,7 @@ exports.exitIfError = (cp) => {
   function exitIfString (str) {
     if (str) {
       signal.fatal(str)
+      signal.debug(exports.getConfig())
       process.exit(1)
     }
   }
