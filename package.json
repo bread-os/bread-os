@@ -1,7 +1,7 @@
 {
   "name": "bread-os",
   "version": "1.0.0",
-  "repository": "https://github.com/skyzh/core-os-riscv.git",
+  "repository": "https://github.com/Himself65/bread-os.git",
   "author": "himself65 <himself65@outlook.com>",
   "license": "MIT",
   "scripts": {
