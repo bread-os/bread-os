@@ -1,5 +1,6 @@
 const signal = require('signale')
 const assert = require('assert')
+const { platform } = require('os')
 const { statSync, existsSync, mkdirSync, unlinkSync } = require('fs')
 const { resolve } = require('path')
 
@@ -13,6 +14,23 @@ const lazyLoadOutputDirStat = () => {
     outputDirStat = statSync(outputDir)
   }
   return outputDirStat
+}
+
+/**
+ *
+ * @param command {string}
+ * @param args {string[]}
+ * @return {{args: string[], command: string}}
+ */
+exports.compatibleSpawnParams = (command, args) => {
+  if (platform() === 'win32') {
+    args = [command, ...args]
+    command = 'wsl'
+  }
+  return {
+    command,
+    args
+  }
 }
 
 exports.checkDependenciesExists = () => {

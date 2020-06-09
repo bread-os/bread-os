@@ -1,8 +1,7 @@
 const { Signale } = require('signale')
 const { spawnSync } = require('child_process')
-const { platform } = require('os')
 const { basename, extname } = require('path')
-const { getConfig, exitIfError } = require('../util')
+const { getConfig, exitIfError, compatibleSpawnParams } = require('../util')
 const data = require('../data')
 const signal = new Signale({
   scope: 'build-kernel'
@@ -34,15 +33,11 @@ module.exports = () => {
   }
   // link
   {
-    const CXX_COMPILER = config.CXX_COMPILER
-
-    let command = CXX_COMPILER
-    let args = []
-    if (platform() === 'win32') {
-      command = 'wsl'
-      args = [CXX_COMPILER]
-    }
-    args = [...args, ...config.KERNEL_BUILD_ARGS.split(' ')]
+    const { command, args } =
+      compatibleSpawnParams(
+        config.CXX_COMPILER,
+        config.KERNEL_BUILD_ARGS.split(' ')
+      )
     const cp = spawnSync(
       command,
       args,
