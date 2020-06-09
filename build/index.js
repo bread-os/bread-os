@@ -1,5 +1,5 @@
 const { program } = require('commander')
-const { checkDependenciesExists, getConfig } = require('./util')
+const { checkDependenciesExists } = require('./util')
 
 checkDependenciesExists()
 
@@ -8,7 +8,7 @@ program.allowUnknownOption(true)
     process.env.DEBUG = 'true'
   })
   .option('--build-kernel', 'build kernel', require('./scripts/build-kernel'))
-  .option('--print-config', 'print config', () => console.log(getConfig()))
+  .option('-p --print-config [args]', 'print config', require('./scripts/print-config'))
   .option('--clean', 'clean output', require('./scripts/clean'))
 
 program.parse(process.argv)
