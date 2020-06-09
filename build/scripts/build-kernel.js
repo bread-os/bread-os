@@ -1,26 +1,12 @@
-const assert = require('assert')
 const { Signale } = require('signale')
 const { spawnSync } = require('child_process')
 const { platform } = require('os')
 const { basename, extname } = require('path')
-const { getConfig } = require('../util')
+const { getConfig, exitIfError } = require('../util')
 const data = require('../data')
 const signal = new Signale({
   scope: 'build-kernel'
 })
-
-const exitIfError = (cp) => {
-  assert.ifError(cp.error)
-  exitIfString(cp.stderr.toString('utf-8').trim())
-  exitIfString(cp.stdout.toString('utf-8').trim())
-
-  function exitIfString (str) {
-    if (str) {
-      signal.fatal(str)
-      process.exit(1)
-    }
-  }
-}
 
 module.exports = () => {
   signal.pending('Start')
@@ -43,6 +29,10 @@ module.exports = () => {
   // link
   {
     const config = getConfig()
+    signal.debug(
+      'DEBUG mode: %s',
+      process.env.NODE_ENV === 'debug' ? 'on' : 'off'
+    )
     const CXX_COMPILER = config.CXX_COMPILER
 
     let command = CXX_COMPILER

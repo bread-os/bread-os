@@ -1,3 +1,5 @@
+const signal = require('signale')
+const assert = require('assert')
 const { statSync, existsSync, mkdirSync, unlinkSync } = require('fs')
 const { resolve } = require('path')
 
@@ -28,18 +30,52 @@ exports.checkDependenciesExists = () => {
   }
 }
 
-let config = null
 /**
  *
+ * @param cp {SpawnSyncReturns}
+ */
+exports.exitIfError = (cp) => {
+  assert.ifError(cp.error)
+  exitIfString(cp.stderr.toString('utf-8').trim())
+  exitIfString(cp.stdout.toString('utf-8').trim())
+
+  function exitIfString (str) {
+    if (str) {
+      signal.fatal(str)
+      process.exit(1)
+    }
+  }
+}
+
+let config = null
+let current = process.env.NODE_ENV
+/**
+ * Dynamic load the config file when `process.env.DEBUG` changed.
  * @param filename {string}
  * @return {object}
  */
 exports.getConfig = (filename = 'make.config.js') => {
-  if (config) return config
-  try {
-    config = require(resolve(cwd, filename))
-  } catch (_) {
-    config = {}
+  if (currentChanged()) {
+    return tryLoadConfig()
   }
-  return config
+  if (config) return config
+  return tryLoadConfig()
+  // end
+
+  function currentChanged () {
+    if (process.env.DEBUG !== current) {
+      current = process.env.NODE_ENV
+      return true
+    }
+    return false
+  }
+
+  function tryLoadConfig () {
+    try {
+      config = require(resolve(cwd, filename))(current === 'debug')
+    } catch (_) {
+      config = {}
+    }
+    return config
+  }
 }
