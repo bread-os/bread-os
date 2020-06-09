@@ -4,13 +4,23 @@
 
 ## Requirement
 
-- [`nasm`](https://www.nasm.us/)
+- [`node.js`](https://nodejs.org)(using [nvm](https://github.com/nvm-sh/nvm))
 
-- [`gcc/g++`](https://gcc.gnu.org/)
+### Windows
+
+- [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+
+- [`nasm`](https://www.nasm.us/)
 
 - [`cmake`](https://cmake.org/)
 
-- [`node.js`](https://nodejs.org)(using [nvm](https://github.com/nvm-sh/nvm))
+### Linux
+
+Fow now, we use Linux to compile `*.cpp` files and link binaries.
+
+```bash
+apt install gcc g++
+```
 
 Please **add** them to environment variables
 
@@ -19,7 +29,7 @@ Please **add** them to environment variables
 ```sh
 sh build.bash --help
 # run
-qemu-system-x86_64 out/boot.bin
+qemu-system-x86_64 out/kernel.bin
 ```
 
 ## LICENSE
