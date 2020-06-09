@@ -9,7 +9,12 @@ const signal = new Signale({
 })
 
 module.exports = () => {
-  signal.pending('Start')
+  signal.pending('start')
+  const config = getConfig()
+  signal.debug(
+    'DEBUG mode: %s',
+    process.env.NODE_ENV === 'debug' ? 'on' : 'off'
+  )
   const { boot } = data
   {
     const [{ entry: bootFile, format }] = boot.splice(0, 1)
@@ -25,14 +30,10 @@ module.exports = () => {
       '-f', format
     ])
     exitIfError(cp)
+    signal.success('boot build done')
   }
   // link
   {
-    const config = getConfig()
-    signal.debug(
-      'DEBUG mode: %s',
-      process.env.NODE_ENV === 'debug' ? 'on' : 'off'
-    )
     const CXX_COMPILER = config.CXX_COMPILER
 
     let command = CXX_COMPILER
@@ -51,6 +52,7 @@ module.exports = () => {
       }
     )
     exitIfError(cp)
+    signal.success('kernel build done')
   }
-  signal.success('Done')
+  signal.success('all done')
 }

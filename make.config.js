@@ -2,6 +2,7 @@ module.exports = (debug = true) => {
   const e = {}
   e.CC_COMPILER = 'gcc'
   e.CXX_COMPILER = 'g++'
+  e.CXX_FLAGS = '-m64 -nostdlib -ffreestanding -std=c++11 -mno-red-zone -fno-exceptions -nostdlib -fno-rtti -Wall -Wextra -Werror'
   e.OUTPUT_DIR = 'out'
 
   e.BOOTLOADER_FILE = 'src/boot/boot.cpp'
@@ -11,10 +12,9 @@ module.exports = (debug = true) => {
 
   e.KERNEL_OUTPUT = `${e.OUTPUT_DIR}/kernel.bin`
   e.KERNEL_BUILD_ARGS =
-    // todo: does '-g' param for single file or all files?
-    `-m64 ${debug ? '-g' : ''} ${e.BOOTLOADER_FILE} ${debug ? '-g' : ''} ${e.BOOTLOADER_OUTPUT} ` +
+    e.CXX_FLAGS +
+    `${debug ? '-g' : ''} ${e.BOOTLOADER_FILE} ${e.BOOTLOADER_OUTPUT} ` +
     `-o ${e.KERNEL_OUTPUT} ` +
-    '-nostdlib -ffreestanding -std=c++11 -mno-red-zone -fno-exceptions -nostdlib -fno-rtti -Wall -Wextra -Werror ' +
     `-T ${e.LINK_FILE}`
   return e
 }
