@@ -28,7 +28,7 @@ jobs:
         env:
           CI: true
       - name: Install Requirement
-        run: sudo apt install nasm gcc g++
+        run: sudo apt install nasm gcc g++ bochs bochs-x
       - name: Build Kernel(production)
         run: yarn build
       - name: Build Kernel(debug)
