@@ -54,8 +54,9 @@ module.exports = () => {
       'bximage',
       config.IMAGE_CREATE_ARGS.split(' '),
       {
-        encoding: 'utf-8',
-        stdio: 'inherit'
+        // fixme: incorrectly handle
+        timeout: 2000,
+        encoding: 'utf-8'
       }
     )
     exitIfError(cp)
