@@ -1,8 +1,6 @@
 const { Signale } = require('signale')
 const { spawnSync } = require('child_process')
-const { basename, extname } = require('path')
 const { getConfig, exitIfError, compatibleSpawnParams } = require('../util')
-const data = require('../data')
 const signal = new Signale({
   scope: 'build-kernel'
 })
@@ -14,20 +12,16 @@ module.exports = () => {
     'DEBUG mode: %s',
     process.env.NODE_ENV === 'debug' ? 'on' : 'off'
   )
-  const { boot } = data
+  // build boot file
   {
-    const [{ entry: bootFile, format }] = boot.splice(0, 1)
-    const filename = basename(bootFile, extname(bootFile))
-    const kernelOutput = `out/${filename}.bin`
     // fixme: use spawn instead of spawnSync?
-    const cp = spawnSync('nasm', [
-      `${bootFile}`,
-      '-o',
-      kernelOutput,
-      '-l', // todo: user can trigger if generate .lst files
-      `out/${filename}.lst`,
-      '-f', format
-    ])
+    const cp = spawnSync(
+      'nasm',
+      config.BOOTLOADER_ENTRY_ARGS.split(' '),
+      {
+        encoding: 'utf-8'
+      }
+    )
     exitIfError(cp)
     signal.success('boot build done')
   }
@@ -43,11 +37,34 @@ module.exports = () => {
       args,
       {
         env: process.env,
-        cwd: process.cwd()
+        cwd: process.cwd(),
+        encoding: 'utf-8'
       }
     )
     exitIfError(cp)
     signal.success('kernel build done')
+  }
+  // make image
+  {
+    /**
+     * fixme: use typescript?
+     * @type {ChildProcess}
+     */
+    const cp = spawnSync(
+      'bximage',
+      config.IMAGE_CREATE_ARGS.split(' '),
+      {
+        encoding: 'utf-8',
+        stdio: 'inherit'
+      }
+    )
+    exitIfError(cp)
+    signal.success('bximage done')
+  }
+  // todo: write kernel to image
+  // eslint-disable-next-line no-lone-blocks
+  {
+
   }
   signal.success('all done')
 }

@@ -1,4 +1,9 @@
 const { program } = require('commander')
+const { resolve } = require('path')
+// tip: load env file before every script
+require('dotenv').config({
+  path: resolve(process.cwd(), '.env')
+})
 const { checkDependenciesExists } = require('./util')
 
 checkDependenciesExists()

@@ -53,9 +53,10 @@ exports.checkDependenciesExists = () => {
  * @param cp {SpawnSyncReturns}
  */
 exports.exitIfError = (cp) => {
+  if (cp.status === 0) return
   assert.ifError(cp.error)
-  exitIfString(cp.stderr.toString('utf-8').trim())
-  exitIfString(cp.stdout.toString('utf-8').trim())
+  exitIfString(cp.stderr.trim())
+  exitIfString(cp.stdout.trim())
 
   function exitIfString (str) {
     if (str) {
@@ -79,6 +80,7 @@ exports.getConfig = (filename = 'make.config.js') => {
   }
   if (config) return config
   return tryLoadConfig()
+
   // end
 
   function currentChanged () {
