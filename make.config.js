@@ -28,7 +28,7 @@ module.exports = (debug = true) => {
   e.IMAGE_OUTPUT = `${e.OUTPUT_DIR}/kernel.img`
   // tip: quiet mode '-q'
   //  but if IMAGE_OUTPUT exists it will fall back to interactive mode
-  e.IMAGE_CREATE_ARGS = `-q -fd="1.44M" -mode=create ${e.IMAGE_OUTPUT}`
+  e.IMAGE_CREATE_ARGS = `-q -fd=1.44M -mode=create ${e.IMAGE_OUTPUT}`
 
   e.DD_ARGS = `if=${e.KERNEL_OUTPUT} of=${e.IMAGE_OUTPUT} bs=512 count=1 conv=notrunc`
 
