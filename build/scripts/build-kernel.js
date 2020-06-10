@@ -44,28 +44,5 @@ module.exports = () => {
     exitIfError(cp)
     signal.success('kernel build done')
   }
-  // make image
-  {
-    /**
-     * fixme: use typescript?
-     * @type {ChildProcess}
-     */
-    const cp = spawnSync(
-      'bximage',
-      config.IMAGE_CREATE_ARGS.split(' '),
-      {
-        // fixme: incorrectly handle
-        timeout: 2000,
-        encoding: 'utf-8'
-      }
-    )
-    exitIfError(cp)
-    signal.success('bximage done')
-  }
-  // todo: write kernel to image
-  // eslint-disable-next-line no-lone-blocks
-  {
-
-  }
   signal.success('all done')
 }
