@@ -16,7 +16,7 @@ boot.bin:
 boot.cpp: boot.bin
 	g++ \
 	-nostdlib -ffreestanding -std=c++11 -fno-pie -mno-red-zone -fno-exceptions -nostdlib -fno-rtti -Wall -Wextra -Werror \
-	-m32 src/boot/boot.cpp ${OUTPUT_DIR}/boot.bin \
+	-m32 src/print.h src/boot/boot.cpp ${OUTPUT_DIR}/boot.bin \
 	-o ${OUTPUT_DIR}/kernel.bin \
 	-T src/boot/linker.ld
 
