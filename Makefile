@@ -1,6 +1,9 @@
 OUTPUT_DIR=out
 
-all: boot.bin boot.cpp
+all:
+	mkdir -p ${OUTPUT_DIR}
+	make boot.bin
+	make boot.cpp
 
 boot.bin:
 	nasm src/boot/boot.asm \
