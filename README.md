@@ -4,22 +4,18 @@
 
 ## Requirement
 
-- [`node.js`](https://nodejs.org)(using [nvm](https://github.com/nvm-sh/nvm))
-
 ### Windows
 
-- [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
-
-- [`nasm`](https://www.nasm.us/)
-
-- [`cmake`](https://cmake.org/)
+We only support
+[Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
+on Windows10.
 
 ### Linux
 
 Fow now, we use Linux to compile `*.cpp` files and link binaries.
 
 ```bash
-apt install gcc g++
+apt install gcc g++ nasm qemu
 ```
 
 Please **add** them to environment variables
@@ -27,7 +23,12 @@ Please **add** them to environment variables
 ## Usage
 
 ```sh
-sh build.bash --help
+# if you are Windows user, add this line
+wsl
+# then, we all on the Linux
+# make project
+make
+
 # run
 qemu-system-x86_64 out/kernel.bin
 ```

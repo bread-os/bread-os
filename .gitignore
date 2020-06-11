@@ -2,15 +2,10 @@
 cmake-build-debug
 out
 
+# dialog dir
+debug
+
 # nasm output bin
 *.bin
 # nasm list file
 *.lst
-
-# node
-node_modules
-yarn.lock
-package-lock.json
-
-# env config
-.env
