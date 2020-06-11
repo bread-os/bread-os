@@ -62,8 +62,8 @@ copy_target:
 bits 32
 	hello: db "Hello more than 512 bytes words!!", 0
 boot2:
-	mov esi,hello
-	mov ebx,0xb8000
+	mov esi, hello
+	mov ebx, 0xb8000
 .loop:
 	lodsb
 	or al,al
