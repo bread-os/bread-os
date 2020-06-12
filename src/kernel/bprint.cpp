@@ -1,5 +1,9 @@
 #include <bprint.h>
 
+// tip: cannot change this address, but value in address
+//  we use vge[pos] to point the real address
+constexpr short *vga = (short *)0xb8000;
+
 Printer &operator<<(Printer &printer, const int value)
 {
   // get char in value
@@ -10,7 +14,7 @@ Printer &operator<<(Printer &printer, const int value)
     // todo: godo next line
   default:
     // todo: when vga address overflow, fresh the vga value
-    printer.vga[printer.pos++] = value;
+    vga[printer.pos++] = value;
     break;
   }
   return printer;
