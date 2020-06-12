@@ -8,3 +8,7 @@ debug
 *.bin
 # nasm list file
 *.lst
+
+# configuration
+.idea
+.vscode
