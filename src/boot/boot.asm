@@ -8,13 +8,13 @@ boot:
 	int 0x10
 
 	mov [disk], dl
-	mov ah, 0x2    ;read sectors
-	mov al, 6      ;sectors to read
-	mov ch, 0      ;cylinder idx
-	mov dh, 0      ;head idx
-	mov cl, 2      ;sector idx
-	mov dl, [disk] ;disk idx
-	mov bx, copy_target;target pointer
+	mov ah, 0x2		; read sectors
+	mov al, 6		; sectors to read
+	mov ch, 0		; cylinder idx
+	mov dh, 0		; head idx
+	mov cl, 2		; sector idx
+	mov dl, [disk]	; disk idx
+	mov bx, copy_target	; target pointer
 	int 0x13
 
 	cli
@@ -57,12 +57,12 @@ CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
 
 times 510 - ($-$$) db 0
-dw 0xaa55
+dw 0xaa55	; magic number
 copy_target:
 bits 32
-	hello: db "Hello more than 512 bytes words!!", 0
+	mbr-load: db "[bread-os:log] MBR load success.", 0
 boot2:
-	mov esi, hello
+	mov esi, mbr-load
 	mov ebx, 0xb8000
 .loop:
 	lodsb
