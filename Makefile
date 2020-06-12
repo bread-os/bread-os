@@ -16,7 +16,7 @@ boot.bin:
 boot.cpp: boot.bin
 	g++ \
 	-nostdlib -fno-threadsafe-statics -ffreestanding -std=c++11 -fno-pie -mno-red-zone -fno-exceptions -fno-rtti -Wall -Wextra -Werror \
-	-m32 ${OUTPUT_DIR}/boot.bin src/boot/boot.cpp src/kernel/bprint.cpp \
+	-m32 ${OUTPUT_DIR}/boot.bin src/boot/boot.cpp src/kernel/bprint.cpp src/kernel/util.cpp \
 	-I src/include \
 	-o ${OUTPUT_DIR}/kernel.bin \
 	-T src/boot/linker.ld

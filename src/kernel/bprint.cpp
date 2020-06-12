@@ -1,5 +1,5 @@
 #include <bprint.h>
-#include <butil.h>
+#include <util.h>
 
 static short *const vga = reinterpret_cast<short *>(0xb8000);
 

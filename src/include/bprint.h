@@ -1,5 +1,7 @@
 #pragma once
 #include <bstddef.h>
+#include <util.h>
+
 class Printer
 {
 public:
