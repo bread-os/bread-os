@@ -1,5 +1,4 @@
 # output dirs
-cmake-build-debug
 out
 
 # dialog dir
