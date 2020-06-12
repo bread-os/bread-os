@@ -9,7 +9,7 @@ public:
     return _printer;
   }
 
-  friend Printer &operator<<(Printer &pointer, const int code);
+  friend Printer &operator<<(Printer &printer, const int code);
 
 private:
   // fixme: because we already print to the frist line when bootloader, so we use `pos(80)` here
@@ -29,7 +29,7 @@ public:
                       Color fontColor = Color::Black,
                       Color backgroundColor = Color::White) : _code(ch), _fontColor(fontColor), _backgroundColor(backgroundColor) {}
 
-  friend Printer &operator<<(Printer &pointer, const ScreenChar &sc);
+  friend Printer &operator<<(Printer &printer, const ScreenChar &sc);
 
 private:
   char _code;

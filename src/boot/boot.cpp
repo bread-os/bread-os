@@ -6,10 +6,10 @@
 extern "C" void kmain()
 {
   const char *hello = "[braed-os:log] kmain load success.";
-  Printer &pointer = Printer::instance();
+  Printer &printer = Printer::instance();
   for (size_t pos = 0; hello[pos] != '\0'; ++pos)
   {
-    pointer << ScreenChar(hello[pos]);
+    printer << ScreenChar(hello[pos]);
   }
 }
 
