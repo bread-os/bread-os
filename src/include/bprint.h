@@ -1,23 +1,25 @@
-#ifndef BREAD_OS_BPRINT_H
-#define BREAD_OS_BPRINT_H
-enum class Color
+#pragma once
+#include <bstddef.h>
+class Printer
 {
-  Black = 0x0,
-  Blue = 0x1,
-  Green = 0x2,
-  Cyan = 0x3,
-  Red = 0x4,
-  Magenta = 0x5,
-  Brown = 0x6,
-  LightGray = 0x7,
-  DarkGray = 0x8,
-  LightBlue = 0x9,
-  LightGreen = 0xA,
-  LightCyan = 0xB,
-  LightRed = 0xC,
-  Pink = 0xD,
-  Yellow = 0xE,
-  White = 0xF
+public:
+  static Printer &instance()
+  {
+    static Printer _printer;
+    return _printer;
+  }
+
+  friend Printer &operator<<(Printer &pointer, const int code);
+
+private:
+  // fixme: because we already print to the frist line when bootloader, so we use `pos(80)` here
+  Printer() : pos(80) {}
+
+  // tip: cannot change this address, not value in address
+  //  we use vge[pos] to point the real address
+  short *const vga = (short *)0xb8000;
+  volatile char buf[1024];
+  volatile int pos;
 };
 
 class ScreenChar
@@ -27,16 +29,10 @@ public:
                       Color fontColor = Color::Black,
                       Color backgroundColor = Color::White) : _code(ch), _fontColor(fontColor), _backgroundColor(backgroundColor) {}
 
-  // fixme: remove this
-  short getContent() const
-  {
-    return (static_cast<char>(_fontColor) << 12) | (static_cast<char>(_backgroundColor) << 8) | _code;
-  }
+  friend Printer &operator<<(Printer &pointer, const ScreenChar &sc);
 
 private:
   char _code;
   Color _fontColor;
   Color _backgroundColor;
 };
-
-#endif //BREAD_OS_BPRINT_H

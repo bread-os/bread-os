@@ -15,8 +15,8 @@ boot.bin:
 # -S -masm=intel x.c -o ${OUTPUT_DIR}/kernel.s
 boot.cpp: boot.bin
 	g++ \
-	-nostdlib -ffreestanding -std=c++11 -fno-pie -mno-red-zone -fno-exceptions -nostdlib -fno-rtti -Wall -Wextra -Werror \
-	-m32 src/boot/boot.cpp ${OUTPUT_DIR}/boot.bin \
+	-nostdlib -fno-threadsafe-statics -ffreestanding -std=c++11 -fno-pie -mno-red-zone -fno-exceptions -fno-rtti -Wall -Wextra -Werror \
+	-m32 ${OUTPUT_DIR}/boot.bin src/boot/boot.cpp src/kernel/bprint.cpp \
 	-I src/include \
 	-o ${OUTPUT_DIR}/kernel.bin \
 	-T src/boot/linker.ld

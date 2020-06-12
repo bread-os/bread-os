@@ -60,9 +60,9 @@ times 510 - ($-$$) db 0
 dw 0xaa55	; magic number
 copy_target:
 bits 32
-	mbr-load: db "[bread-os:log] MBR load success.", 0
+	mbr_load: db "[bread-os:log] MBR load success.", 0
 boot2:
-	mov esi, mbr-load
+	mov esi, mbr_load
 	mov ebx, 0xb8000
 .loop:
 	lodsb
