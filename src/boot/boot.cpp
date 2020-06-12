@@ -5,12 +5,11 @@
 
 extern "C" void kmain()
 {
-  const char *hello = "[braed-os:log] kmain load success.";
+  const char hello[] = "[braed-os:log] kmain load success.";
   Printer &printer = Printer::instance();
-  for (size_t pos = 0; hello[pos] != '\0'; ++pos)
-  {
-    printer << ScreenChar(hello[pos]);
-  }
+  printer << hello;
+  printer << '\n';
+  printer << "this is nextline.\nand this is another newline.";
 }
 
 #endif //BREAD_OS_BOOT

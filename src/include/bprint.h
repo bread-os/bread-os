@@ -10,10 +10,14 @@ public:
   }
 
   friend Printer &operator<<(Printer &printer, const int code);
+  friend Printer &operator<<(Printer &printer, const char ch);
+  friend Printer &operator<<(Printer &printer, const char *str);
 
 private:
-  // fixme: because we already print to the frist line when bootloader, so we use `pos(80)` here
+  // todo: because we already print to the frist line when bootloader, so we use `pos(80)` here
   Printer() : pos(80) {}
+  inline void upperShift();
+  inline void nextline();
 
   volatile char buf[1024];
   volatile int pos;

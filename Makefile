@@ -22,7 +22,7 @@ boot.cpp: boot.bin
 	-T src/boot/linker.ld
 
 image: all
-	dd if=${OUTPUT_DIR}/kernel.bin of=${OUTPUT_DIR}/kernel.img bs=512 count=2 conv=notrunc
+	dd if=${OUTPUT_DIR}/kernel.bin of=${OUTPUT_DIR}/kernel.img bs=512 conv=notrunc
 
 clean:
 	rm -rf ${OUTPUT_DIR}/*

@@ -21,4 +21,3 @@ enum class Color
 };
 
 typedef unsigned int size_t;
-typedef short int gcode; // gpu code
