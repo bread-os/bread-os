@@ -1,6 +1,7 @@
 #ifndef BREAD_OS_BPRINT_H
 #define BREAD_OS_BPRINT_H
-enum class Color {
+enum class Color
+{
   Black = 0x0,
   Blue = 0x1,
   Green = 0x2,
@@ -19,16 +20,16 @@ enum class Color {
   White = 0xF
 };
 
-class ScreenChar {
+class ScreenChar
+{
 public:
   explicit ScreenChar(char ch,
                       Color fontColor = Color::Black,
-                      Color backgroundColor = Color::White) :
-    _code(ch), _fontColor(fontColor), _backgroundColor(backgroundColor) {}
-
+                      Color backgroundColor = Color::White) : _code(ch), _fontColor(fontColor), _backgroundColor(backgroundColor) {}
 
   // fixme: remove this
-  short getContent() const {
+  short getContent() const
+  {
     return (static_cast<char>(_fontColor) << 12) | (static_cast<char>(_backgroundColor) << 8) | _code;
   }
 
