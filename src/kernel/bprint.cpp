@@ -44,8 +44,7 @@ void Printer::nextline()
   pos = ((pos / 80) * 80) + 80;
 }
 
-Printer &
-operator<<(Printer &pointer, const ScreenChar &sc)
+Printer &operator<<(Printer &pointer, const ScreenChar &sc)
 {
   const auto value = (static_cast<char>(sc._fontColor) << 12) | (static_cast<char>(sc._backgroundColor) << 8) | sc._code;
   pointer << value;
