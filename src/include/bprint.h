@@ -15,7 +15,7 @@ private:
   // fixme: because we already print to the frist line when bootloader, so we use `pos(80)` here
   Printer() : pos(80) {}
 
-  // tip: cannot change this address, not value in address
+  // tip: cannot change this address, but value in address
   //  we use vge[pos] to point the real address
   short *const vga = (short *)0xb8000;
   volatile char buf[1024];
