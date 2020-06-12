@@ -14,7 +14,7 @@ public:
   friend Printer &operator<<(Printer &printer, const char *str);
 
 private:
-  // todo: because we already print to the frist line when bootloader, so we use `pos(80)` here
+  // tip: because we already print to the frist line when bootloader, so we use `pos(80)` here
   Printer() : pos(80) {}
   inline void upperShift();
   inline void nextline();
