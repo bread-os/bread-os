@@ -1,7 +1,10 @@
+#include <bprint.h>
+#include <bstddef.h>
+
 extern "C" void kmain() {
-  const short color = 0x0f00;
   const char *hello = "Hello cpp world!";
-  short *vga = (short *) 0xb8000;
-  for (int i = 0; i < 16; ++i)
-    vga[i + 80] = color | hello[i];
+  volatile auto *vga = (volatile short *) 0xb8000;
+  for (size_t pos = 0; hello[pos] != '\0'; ++pos) {
+    vga[80 + pos] = ScreenChar(hello[pos]).getContent();
+  }
 }
