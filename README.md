@@ -16,7 +16,7 @@ Fow now, we use Linux to compile `*.cpp` files and link binaries.
 
 ```bash
 apt install gcc g++ nasm qemu
-make iamge
+make image
 qemu-system-x86_64 out/kernel.bin
 ```
 
