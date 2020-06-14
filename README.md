@@ -33,6 +33,10 @@ make
 qemu-system-x86_64 out/kernel.bin
 ```
 
+## Dependencies
+
+- [Bootboot](https://gitlab.com/bztsrc/bootboot): for micro-kernel loader
+
 ## LICENSE
 
 [MIT LICENSE](LICENSE)
