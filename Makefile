@@ -40,7 +40,7 @@ boot.cpp: bprint.cpp util.cpp
 
 	ld -nostdinc -nostdlib \
 	-T src/boot/linker.ld \
-	${OUTPUT_DIR}/boot.o \
+	${OUTPUT_DIR}/boot.o ${OUTPUT_DIR}/bprint.o ${OUTPUT_DIR}/util.o \
 	-o ${OUTPUT_DIR}/kernel.elf
 
 bprint.cpp:
