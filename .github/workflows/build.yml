@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+        with:
+          submodules: true
       - name: Install Requirement
         run: sudo apt install nasm gcc g++
       - name: Build Kernel
