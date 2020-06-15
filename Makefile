@@ -30,7 +30,7 @@ image: all
 	sudo cp ${OUTPUT_DIR}/initrd.bin ${OUTPUT_DIR}/boot/BOOTBOOT/INITRD || true
 	sudo umount -f /dev/loop* 2>/dev/null || true
 
-	cp deps/bootboot/boot.bin ${OUTPUT_DIR}/boot.bin
+	cp deps/bootboot/boot.bin ${OUTPUT_DIR}/boot.bin	# fixme
 	cd ${OUTPUT_DIR} && ./mkimg $(DISKSIZE) ./disk.img
 
 boot.cpp: bprint.cpp util.cpp
@@ -38,9 +38,10 @@ boot.cpp: bprint.cpp util.cpp
 	-I src/include \
 	-I deps/bootboot
 
+	ld -r -b binary -o ${OUTPUT_DIR}/font.o deps/bootboot/mykernel/font.psf
 	ld -nostdinc -nostdlib \
 	-T src/boot/linker.ld \
-	${OUTPUT_DIR}/boot.o ${OUTPUT_DIR}/bprint.o ${OUTPUT_DIR}/util.o \
+	${OUTPUT_DIR}/font.o ${OUTPUT_DIR}/boot.o ${OUTPUT_DIR}/bprint.o ${OUTPUT_DIR}/util.o \
 	-o ${OUTPUT_DIR}/kernel.elf
 
 bprint.cpp:
