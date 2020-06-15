@@ -21,12 +21,12 @@ image: all
 	dd if=/dev/zero of=${OUTPUT_DIR}/bootpart.bin bs=1024 count=$(BOOTSIZE) >/dev/null 2>/dev/null
 	mkfs.vfat -F $(BOOTTYPE) -n "EFI System" ${OUTPUT_DIR}/bootpart.bin 2>/dev/null >/dev/null
 	mkdir -p ${OUTPUT_DIR}/boot
-	sudo mount -o loop,user ${OUTPUT_DIR}/bootpart.bin ${OUTPUT_DIR}/boot
+	sudo mount -o loop,user ${OUTPUT_DIR}/bootpart.bin ${OUTPUT_DIR}/boot || true
 	sudo mkdir -p ${OUTPUT_DIR}/boot/BOOTBOOT
 	sudo cp deps/bootboot/bootboot.bin ${OUTPUT_DIR}/boot/BOOTBOOT/LOADER
 	sudo mkdir -p ${OUTPUT_DIR}/boot/EFI ${OUTPUT_DIR}/boot/EFI/BOOT
 	sudo cp deps/bootboot/bootboot.efi ${OUTPUT_DIR}/boot/EFI/BOOT/BOOTX64.EFI
-	sudo echo -e "screen=800x600\nkernel=sys/core\n" > sudo ${OUTPUT_DIR}/boot/BOOTBOOT/CONFIG
+	sudo bash -c "echo -e "screen=800x600\nkernel=sys/core\n" > ${OUTPUT_DIR}/boot/BOOTBOOT/CONFIG"
 	sudo cp ${OUTPUT_DIR}/initrd.bin ${OUTPUT_DIR}/boot/BOOTBOOT/INITRD || true
 	sudo umount -f /dev/loop* 2>/dev/null || true
 
@@ -34,7 +34,7 @@ image: all
 	cd ${OUTPUT_DIR} && ./mkimg $(DISKSIZE) ./disk.img
 
 boot.cpp: bprint.cpp util.cpp
-	g++ ${GXX_FLAGS} -c src/boot/boot.cpp -o ${OUTPUT_DIR}/boot.o \
+	g++ ${CXX_FLAGS} -c src/boot/boot.cpp -o ${OUTPUT_DIR}/boot.o \
 	-I src/include \
 	-I deps/bootboot
 
@@ -44,17 +44,17 @@ boot.cpp: bprint.cpp util.cpp
 	-o ${OUTPUT_DIR}/kernel.elf
 
 bprint.cpp:
-	g++ ${GCC_FLAGS} -c src/kernel/bprint.cpp -o ${OUTPUT_DIR}/bprint.o \
+	g++ ${CXX_FLAGS} -c src/kernel/bprint.cpp -o ${OUTPUT_DIR}/bprint.o \
 	-I src/include \
 	-I deps/bootboot
 
 util.cpp:
-	g++ ${GCC_FLAGS} -c src/kernel/util.cpp -o ${OUTPUT_DIR}/util.o \
+	g++ ${CXX_FLAGS} -c src/kernel/util.cpp -o ${OUTPUT_DIR}/util.o \
 	-I src/include \
 	-I deps/bootboot
 
 mking.c:
-	gcc -ansi -pedantic -Wall -Wextra -g deps/bootboot/images/mkimg.c -o ${OUTPUT_DIR}/mkimg
+	gcc -ansi -pedantic -Wall -Wextra -g build/mkimg.c -o ${OUTPUT_DIR}/mkimg
 
 clean:
 	rm -rf ${OUTPUT_DIR}/*
