@@ -12,6 +12,11 @@ all:
 	make mking.c
 	make boot.cpp
 
+edk2:
+	cd ./deps/edk2 && sudo /bin/bash ./edksetup.sh 2>/dev/null >/dev/null || true
+	cp -f build/target.txt deps/edk2/Conf/target.txt
+	cd ./deps/edk2 && make -C BaseTools && build -DDEBUG_ON_SERIAL_PORT=TRUE
+
 image: all
 	mkdir -p ${OUTPUT_DIR}/initrd ${OUTPUT_DIR}/initrd/sys
 	cp ${OUTPUT_DIR}/kernel.elf ${OUTPUT_DIR}/initrd/sys/core
