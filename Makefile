@@ -1,5 +1,6 @@
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 OUTPUT_DIR=out
+OVMF_PATH=deps/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd
 DISKSIZE=128
 BOOTSIZE=16384
 BOOTTYPE=16
@@ -10,29 +11,16 @@ CXX_FLAGS= \
 
 all:
 	mkdir -p ${OUTPUT_DIR}
-	make mking.c
 	make boot.cpp
 
-image: all
-	mkdir -p ${OUTPUT_DIR}/initrd ${OUTPUT_DIR}/initrd/sys
-	cp ${OUTPUT_DIR}/kernel.elf ${OUTPUT_DIR}/initrd/sys/core
-	cd ${OUTPUT_DIR}/initrd && (find . | cpio -H hpodc -o | gzip > ../initrd.bin) && cd ..
-	rm -r ${OUTPUT_DIR}/initrd 2>/dev/null || true
+uefi:
+	sh build/make-uefi.sh
 
-	dd if=/dev/zero of=${OUTPUT_DIR}/bootpart.bin bs=1024 count=$(BOOTSIZE) >/dev/null 2>/dev/null
-	mkfs.vfat -F $(BOOTTYPE) -n "EFI System" ${OUTPUT_DIR}/bootpart.bin 2>/dev/null >/dev/null
-	mkdir -p ${OUTPUT_DIR}/boot
-	sudo mount -o loop,user ${OUTPUT_DIR}/bootpart.bin ${OUTPUT_DIR}/boot || true
-	sudo mkdir -p ${OUTPUT_DIR}/boot/BOOTBOOT
-	sudo cp deps/bootboot/bootboot.bin ${OUTPUT_DIR}/boot/BOOTBOOT/LOADER
-	sudo mkdir -p ${OUTPUT_DIR}/boot/EFI ${OUTPUT_DIR}/boot/EFI/BOOT
-	sudo cp deps/bootboot/bootboot.efi ${OUTPUT_DIR}/boot/EFI/BOOT/BOOTX64.EFI
-	sudo bash -c "echo -e "screen=800x600\nkernel=sys/core\n" > ${OUTPUT_DIR}/boot/BOOTBOOT/CONFIG"
-	sudo cp ${OUTPUT_DIR}/initrd.bin ${OUTPUT_DIR}/boot/BOOTBOOT/INITRD || true
-	sudo umount -f /dev/loop* 2>/dev/null || true
-
-	cp deps/bootboot/boot.bin ${OUTPUT_DIR}/boot.bin	# fixme
-	cd ${OUTPUT_DIR} && ./mkimg $(DISKSIZE) ./disk.img
+start:
+	qemu-system-x86_64 -cpu qemu64 \
+		-cpu qemu64 -bios ${OVMF_PATH} \
+		-drive file=${OUTPUT_DIR}/uefi.img,if=ide \
+  		-net none
 
 boot.cpp: bprint.cpp util.cpp
 	g++ ${CXX_FLAGS} -c src/boot/boot.cpp -o ${OUTPUT_DIR}/boot.o \
@@ -54,9 +42,6 @@ util.cpp:
 	g++ ${CXX_FLAGS} -c src/kernel/util.cpp -o ${OUTPUT_DIR}/util.o \
 	-I src/include \
 	-I deps/bootboot
-
-mking.c:
-	gcc -ansi -pedantic -Wall -Wextra -g build/mkimg.c -o ${OUTPUT_DIR}/mkimg
 
 clean:
 	rm -rf ${OUTPUT_DIR}/*
