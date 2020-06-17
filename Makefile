@@ -15,7 +15,7 @@ all:
 edk2:
 	cd ./deps/edk2 && sudo /bin/bash ./edksetup.sh 2>/dev/null >/dev/null || true
 	cp -f build/target.txt deps/edk2/Conf/target.txt
-	cd ./deps/edk2 && make -C BaseTools && build -DDEBUG_ON_SERIAL_PORT=TRUE
+	cd ./deps/edk2 && make -C BaseTools && ./BaseTools/BinWrappers/PosixLike/build -DDEBUG_ON_SERIAL_PORT=TRUE
 
 image: all
 	mkdir -p ${OUTPUT_DIR}/initrd ${OUTPUT_DIR}/initrd/sys
