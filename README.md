@@ -15,7 +15,7 @@ on Windows10.
 Fow now, we use Linux to compile `*.cpp` files and link binaries.
 
 ```bash
-apt install gcc g++ nasm qemu
+apt install make gcc g++ nasm qemu qemu-kvm build-essential git uuid-dev iasl
 make image
 qemu-system-x86_64 out/kernel.bin
 ```
