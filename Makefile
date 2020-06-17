@@ -16,7 +16,7 @@ all:
 uefi:
 	sh build/make-uefi.sh
 
-start:
+start: all uefi
 	qemu-system-x86_64 -cpu qemu64 \
 		-cpu qemu64 -bios ${OVMF_PATH} \
 		-drive file=${OUTPUT_DIR}/uefi.img,if=ide \

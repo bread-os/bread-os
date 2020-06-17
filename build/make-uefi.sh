@@ -33,7 +33,6 @@ rm out/temp.img
 sudo losetup --offset 1048576 --sizelimit 46934528 /dev/loop9 out/uefi.img
 sudo mount /dev/loop9 /mnt
 # copy files
-sudo cp -r out/uefi /mnt
-
+sudo cp -r out/uefi/* /mnt/
 sudo umount /mnt
 sudo losetup -d /dev/loop9
