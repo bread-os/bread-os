@@ -15,6 +15,7 @@ cp out/initrd.bin out/uefi/BOOTBOOT/INITRD
 # copy bootboot files
 cp deps/bootboot/bootboot.efi out/uefi/EFI/BOOT/BOOTX64.EFI
 cp deps/bootboot/bootboot.bin out/uefi/BOOTBOOT/LOADER
+cp build/config.txt out/uefi/BOOTBOOT/CONFIG  # config file
 
 ## Image generate
 dd if=/dev/zero of=out/uefi.img bs=512 count=93750
