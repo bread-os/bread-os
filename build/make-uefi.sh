@@ -8,7 +8,7 @@ mkdir -p out/uefi/BOOTBOOT
 mkdir -p out/initrd out/initrd/sys
 
 cp out/kernel.elf out/initrd/sys/core # tip: use sys/core as the entry point
-cd out/initrd && (find . | cpio -H hpodc -o | gzip > ../initrd.bin) && cd ../..
+cd out/initrd && (find . | cpio -H hpodc -o | gzip >../initrd.bin) && cd ../..
 rm -rf out/initrd # remove tmp dir
 cp out/initrd.bin out/uefi/BOOTBOOT/INITRD
 
