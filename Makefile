@@ -1,5 +1,5 @@
 OUTPUT_DIR=out
-OVMF_PATH=deps/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.
+OVMF_PATH=deps/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd
 CXX=g++
 CXX_FLAGS= \
 	-nostdinc -nostdlib -nostartfiles -fno-stack-protector -fno-threadsafe-statics -ffreestanding -fno-pie -fno-exceptions -fno-rtti \
