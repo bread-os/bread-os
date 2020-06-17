@@ -1,7 +1,7 @@
+#include <bstddef.h>
+#include <bootboot.h>
 #include <bprint.h>
 #include <util.h>
-
-static short *const vga = reinterpret_cast<short *>(0xb8000);
 
 Printer &operator<<(Printer &printer, const int value)
 {
@@ -14,7 +14,7 @@ Printer &operator<<(Printer &printer, const int value)
   }
   if (printer.pos == 2000)
     printer.upperShift();
-  vga[printer.pos++] = value;
+  // fixme
 end:
   return printer;
 }
@@ -35,8 +35,7 @@ Printer &operator<<(Printer &printer, const char *str)
 
 void Printer::upperShift()
 {
-  for (size_t i = 0; i < 24 * 80; i++)
-    vga[i] = vga[i + 80];
+  // todo
 }
 
 void Printer::nextline()

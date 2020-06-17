@@ -7,7 +7,7 @@ extern unsigned char *environment;
 extern uint8_t fb;
 
 // entry point
-void _start()
+extern "C" void _start()
 {
   int x, y, s = bootboot.fb_scanline, w = bootboot.fb_width, h = bootboot.fb_height;
 
