@@ -6,6 +6,8 @@ debug
 
 # nasm output bin
 *.bin
+# font.o
+font/font.o
 # nasm list file
 *.lst
 
