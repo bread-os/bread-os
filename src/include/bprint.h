@@ -2,21 +2,23 @@
 #include <bstddef.h>
 #include <util.h>
 
+namespace bread_os {
 class Printer {
  public:
-  static Printer &instance() {
+  static auto &instance() {
     static Printer _printer;
     return _printer;
   }
 
-  friend Printer &operator<<(Printer &printer, const int code);
-  friend Printer &operator<<(Printer &printer, const char ch);
-  friend Printer &operator<<(Printer &printer, const char *str);
+  friend Printer &operator<<(Printer &, const char);
+  friend Printer &operator<<(Printer &, const char *);
 
  private:
   Printer() : pos_x(0), pos_y(0) {}
-  inline void upperShift();
+  inline void upper_shift();
   inline void nextline();
 
   volatile int pos_x, pos_y;
 };
+
+}  // namespace bread_os

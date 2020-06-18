@@ -6,10 +6,12 @@
 
 // entry point
 extern "C" void _start() {
-  // MemoryManager::init_memory_manager();
+  using namespace bread_os;
+  auto &printer = Printer::instance();
+  printer << "Hello, world!\n";
 
-  Printer &printer = Printer::instance();
-  printer << "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  MemoryManager::init_memory_manager();
+
   int x, y, s = bootboot.fb_scanline, w = bootboot.fb_width,
             h = bootboot.fb_height;
 

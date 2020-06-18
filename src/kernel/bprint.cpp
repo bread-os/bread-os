@@ -1,5 +1,5 @@
 #include <bprint.h>
-
+namespace bread_os {
 // refs: https://wiki.osdev.org/PC_Screen_Font
 void putchar(unsigned short int c, int cx, int cy,
              // todo: color
@@ -29,9 +29,8 @@ Printer &operator<<(Printer &printer, const char ch) {
   if (ch == '\n') {
     printer.nextline();
     goto end;
-  }
-  if (printer.pos_x == 80) {
-    // todo: nextline
+  } else if (printer.pos_x == 90) {
+    printer.nextline();
   }
   // todo: go back the top when printer overflow
   // fixme: color support
@@ -46,15 +45,17 @@ Printer &operator<<(Printer &printer, const char *str) {
   return printer;
 }
 
-void Printer::upperShift() {
+void Printer::upper_shift() {
   // todo
 }
 
 void Printer::nextline() {
-  // 80 * 60
+  // 90 * 37
   pos_x = 0;
   pos_y++;
-  if (pos_y == 60) {
+  if (pos_y == 37) {
     pos_y = 0;
   }
 }
+
+}  // namespace bread_os
