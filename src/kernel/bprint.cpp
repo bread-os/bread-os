@@ -25,6 +25,16 @@ void putchar(unsigned short int c, int cx, int cy,
   }
 }
 
+template <typename Arg, typename... Args>
+char *format(char *str, Arg &&arg, Args &&... args) {
+  // fixme: use malloc
+  for (size_t pos = 0; str[pos] != '\0'; pos++) {
+    const auto *pos = strchr(str, '%');
+    if (pos == nullptr) return;  //?;
+    // todo
+  }
+}
+
 Printer &operator<<(Printer &printer, const char ch) {
   if (ch == '\n') {
     printer.nextline();

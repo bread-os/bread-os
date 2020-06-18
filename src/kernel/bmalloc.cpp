@@ -6,7 +6,10 @@ void *kernel::unsafe_malloc(size_t size) {
   // previous few mmap for kernel use
   // will not free for user mode
   auto *mmap = &bootboot.mmap;
-  uint64_t ptr = MMapEnt_Ptr(mmap) + memory_length;
+  uint64_t ptr = 0;
+  do {
+    ptr = MMapEnt_Ptr(mmap) + memory_length;
+  } while (ptr + size > MMapEnt_Size(mmap), mmap++);
   memory_length += size;
   return reinterpret_cast<void *>(ptr);
 }

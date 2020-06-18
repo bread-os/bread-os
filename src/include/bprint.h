@@ -3,6 +3,8 @@
 #include <util.h>
 
 namespace bread_os {
+template <typename Arg, typename... Args>
+char *format(char *str, Arg &&arg, Args &&... args);
 class Printer {
  public:
   static auto &instance() {
