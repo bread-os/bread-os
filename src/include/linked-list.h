@@ -2,8 +2,7 @@
 #include <bstddef.h>
 
 template <typename T>
-class ListItem
-{
+class ListItem {
   ListItem(T value);
 
   ListItem *prev, *next;
@@ -12,9 +11,8 @@ class ListItem
 };
 
 template <typename T>
-class LinkedList
-{
-public:
+class LinkedList {
+ public:
   typedef ListItem<T> Item;
   typedef void travel_callback(Item &);
   typedef bool compare_callback(const Item &);
@@ -29,6 +27,6 @@ public:
   void travel(travel_callback cb);
   void remove(compare_callback cb);
 
-private:
+ private:
   Item *_head, *_tail;
 };
