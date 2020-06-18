@@ -22,10 +22,11 @@ start: all uefi
 		-drive file=${OUTPUT_DIR}/uefi.img,if=ide \
   		-net none
 
-# fixme: remove deps/bootboot/mykernel-rust/font.o
 kernel: ${KERNEL_OBJECTS} boot.o
+	cd font && ld -r -b binary -o font.o font.psf
+
 	ld -nostdinc -nostdlib \
-	-T src/boot/linker.ld ${OUTPUT_DIR}/boot.o ${OUTPUT_DIR}/bmalloc.o ${OUTPUT_DIR}/bprint.o ${OUTPUT_DIR}/util.o deps/bootboot/mykernel-rust/font.o \
+	-T src/boot/linker.ld ${OUTPUT_DIR}/boot.o ${OUTPUT_DIR}/bmalloc.o ${OUTPUT_DIR}/bprint.o ${OUTPUT_DIR}/util.o font/font.o \
 	-o ${OUTPUT_DIR}/kernel.elf
 
 boot.o: ${KERNEL_OBJECTS}
