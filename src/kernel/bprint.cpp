@@ -28,11 +28,13 @@ void putchar(unsigned short int c, int cx, int cy,
 template <typename Arg, typename... Args>
 char *format(char *str, Arg &&arg, Args &&... args) {
   // fixme: use malloc
-  for (size_t pos = 0; str[pos] != '\0'; pos++) {
+  for (size_t i = 0; str[i] != '\0'; i++) {
     const auto *pos = strchr(str, '%');
-    if (pos == nullptr) return;  //?;
     // todo
+    if (pos == nullptr) return nullptr;
   }
+  // todo
+  return nullptr;
 }
 
 Printer &operator<<(Printer &printer, const char ch) {
