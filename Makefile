@@ -4,6 +4,7 @@ all: font.o
 	@mkdir -p ${CMAKE_DEBUG_DIR}
 
 kernel: font.o
+	@mkdir -p ${CMAKE_DEBUG_DIR}
 	@cd ${CMAKE_DEBUG_DIR} && cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" .. && make
 
 uefi: kernel
