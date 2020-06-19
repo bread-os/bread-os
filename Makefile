@@ -1,7 +1,9 @@
 include .env
 
-all: font.o
+all:
 	@mkdir -p ${CMAKE_DEBUG_DIR}
+	@make kernel
+	@make uefi
 
 kernel: font.o
 	@mkdir -p ${CMAKE_DEBUG_DIR}
