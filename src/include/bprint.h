@@ -1,9 +1,10 @@
 #pragma once
 #include <bstddef.h>
+#include <bmalloc.h>
 #include <util.h>
 
 namespace bread_os {
-template <typename Arg, typename... Args>
+template<typename Arg, typename... Args>
 char *format(char *str, Arg &&arg, Args &&... args);
 class Printer {
  public:
@@ -16,11 +17,11 @@ class Printer {
   friend Printer &operator<<(Printer &, const char *);
 
  private:
-  Printer() : pos_x(0), pos_y(0) {}
+  Printer();
   inline void upper_shift();
-  inline void nextline();
-
-  volatile int pos_x, pos_y;
+  inline void next_line();
+  char *buffer;
+  int pos_x, pos_y;
 };
 
 }  // namespace bread_os

@@ -16,11 +16,16 @@ extern uint8_t fb;
 extern volatile unsigned char _binary_font_psf_start;
 extern volatile unsigned char _binary_font_psf_end;
 
+constexpr const int BUFFER_SIZE = 256;
+
 size_t strlen(const char *str);
 
 char *strchr(const char *s, const char c);
 
-template <typename T, size_t N>
+template<typename Type>
+void swap(Type &a, Type &b);
+
+template<typename T, size_t N>
 constexpr size_t arraysize(const T (&)[N]) {
   return N;
 }

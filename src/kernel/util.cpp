@@ -11,3 +11,10 @@ char *strchr(const char *s, const char c) {
     if (!*s++) return nullptr;
   return (char *)s;
 }
+
+template<typename Type>
+void swap(Type &a, Type &b) {
+  Type c = b;
+  b = a;
+  a = c;
+}
