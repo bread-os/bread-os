@@ -1,0 +1,3 @@
+target remote :1234
+symbol-file cmake-build-debug/kernel.sym
+break _start

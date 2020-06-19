@@ -1,6 +1,6 @@
 export $(grep -v '^#' .env | xargs -d '\n')
 
-make all
+make uefi
 
 qemu-system-x86_64 -cpu qemu64 \
   -s -S \
