@@ -10,6 +10,8 @@ jobs:
         with:
           submodules: true
       - name: Install Requirement
-        run: sudo apt install nasm gcc g++
-      - name: Build Kernel
+        run: sudo apt install cmake make gcc g++ build-essential uuid-dev iasl python
+      - name: Build Kernel with Makefile
         run: make
+      - name: Build Kernel with Cmake
+        run: cmake .
