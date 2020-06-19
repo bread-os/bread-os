@@ -5,7 +5,7 @@ SET(CMAKE_CXX_FLAGS "-nostdinc -nostdlib -nostartfiles \
     -fno-stack-protector -fno-threadsafe-statics -ffreestanding -fno-pie -no-pie -fno-exceptions -fno-rtti -mcmodel=kernel \
 	-mno-red-zone \
 	-Wall")
-set(CMAKE_CXX_FLAGS_DEBUG  "-g")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_EXE_LINKER_FLAGS "-T${CMAKE_HOME_DIRECTORY}/src/boot/linker.ld")
