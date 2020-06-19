@@ -16,7 +16,7 @@ Fow now, we use Linux to compile `*.cpp` files and link binaries.
 
 ```shell script
 # include deps requirements
-apt install make gcc g++ nasm qemu qemu-kvm build-essential git uuid-dev iasl python
+apt install cmake make gcc g++ nasm qemu qemu-kvm build-essential git uuid-dev iasl python
 
 # start bread-os using qemu-system-x86_64
 make start
