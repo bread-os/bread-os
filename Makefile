@@ -1,19 +1,13 @@
 include .env
-CXX=g++
-CXX_FLAGS= \
-	-g -nostdinc -nostdlib -nostartfiles -fno-stack-protector -fno-threadsafe-statics -ffreestanding -fno-pie -fno-exceptions -fno-rtti -mcmodel=large \
-	-std=c++17 -mno-red-zone \
-	-Wall
 
-KERNEL_OBJECTS=bmalloc.o bprint.o util.o
-KERNEL_INCLUDE=src/include deps/bootboot
+all: font.o
+	@mkdir -p ${CMAKE_DEBUG_DIR}
 
-all:
-	mkdir -p ${OUTPUT_DIR}
-	make kernel
+kernel: font.o
+	@cd ${CMAKE_DEBUG_DIR} && cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" .. && make
 
-uefi:
-	sh build/make-uefi.sh
+uefi: kernel
+	@sh build/make-uefi.sh
 
 start: all uefi
 	qemu-system-x86_64 -cpu qemu64 \
@@ -21,19 +15,14 @@ start: all uefi
 		-drive file=${OUTPUT_DIR}/uefi.img,if=ide \
   		-net none
 
-kernel: ${KERNEL_OBJECTS} boot.o
-	cd font && ld -r -b binary -o font.o font.psf
-
-	ld -nostdinc -nostdlib \
-	-T src/boot/linker.ld ${OUTPUT_DIR}/boot.o ${OUTPUT_DIR}/bmalloc.o ${OUTPUT_DIR}/bprint.o ${OUTPUT_DIR}/util.o font/font.o \
-	-o ${OUTPUT_DIR}/kernel.elf
-
-boot.o: ${KERNEL_OBJECTS}
-	${CXX} ${CXX_FLAGS} -c src/boot/boot.cpp -o ${OUTPUT_DIR}/boot.o ${addprefix -I,${KERNEL_INCLUDE}}
-
-${KERNEL_OBJECTS}: %.o: src/kernel/%.cpp
-	${CXX} ${CXX_FLAGS} -c $< -o ${OUTPUT_DIR}/$@ ${addprefix -I,${KERNEL_INCLUDE}}
+font.o:
+	@cd font && ld -r -b binary -o font.o font.psf
+	@echo "out/font.o"
+	@readelf -s font/font.o
 
 .PNONY: clean
 clean:
-	-rm -rf ${OUTPUT_DIR}/*
+	@echo "remove all files in ${OUTPUT_DIR}"
+	@-rm -rf ${OUTPUT_DIR}/*
+	@echo "remove all files in ${CMAKE_DEBUG_DIR}"
+	@-rm -rf ${CMAKE_DEBUG_DIR}/*
