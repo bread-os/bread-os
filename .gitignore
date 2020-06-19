@@ -1,5 +1,7 @@
 # output dirs
 out
+cmake-build-debug
+cmake-build-release
 
 # dialog dir
 debug
