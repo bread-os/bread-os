@@ -9,11 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_EXE_LINKER_FLAGS "-T${CMAKE_HOME_DIRECTORY}/src/boot/linker.ld")
 
-set(KERNEL_OBJECTS
-        src/kernel/bmalloc.cpp
-        src/kernel/bprint.cpp
-        src/kernel/util.cpp
-        )
+file(GLOB KERNEL_OBJECTS src/kernel/*.cpp)
 
 add_executable(kernel.elf src/boot/boot.cpp font/font.o ${KERNEL_OBJECTS})
 include_directories(BEFORE
