@@ -3,7 +3,7 @@ project(bread-os)
 
 SET(CMAKE_CXX_FLAGS "-g -nostdinc -nostdlib -nostartfiles \
     -fno-stack-protector -fno-threadsafe-statics -ffreestanding -fno-pie -no-pie -fno-exceptions -fno-rtti -mcmodel=kernel \
-	-std=c++17 -mno-red-zone \
+	-mno-red-zone \
 	-Wall")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_COMPILER g++)
