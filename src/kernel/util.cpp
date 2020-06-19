@@ -9,7 +9,7 @@ size_t strlen(const char *str) {
 char *strchr(const char *s, const char c) {
   while (*s != c)
     if (!*s++) return nullptr;
-  return (char *)s;
+  return (char *) s;
 }
 
 template<typename Type>

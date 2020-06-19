@@ -1,7 +1,7 @@
 #pragma once
 #include <bstddef.h>
 
-template <typename T>
+template<typename T>
 class ListItem {
   ListItem(T value);
 
@@ -10,7 +10,7 @@ class ListItem {
   T value;
 };
 
-template <typename T>
+template<typename T>
 class LinkedList {
  public:
   typedef ListItem<T> Item;
