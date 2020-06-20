@@ -1,11 +1,14 @@
 #pragma once
 
 typedef unsigned char uint8_t;
+typedef char int8_t;
 typedef short int int16_t;
 typedef unsigned short int uint16_t;
 typedef unsigned int uint32_t;
+typedef int int32_t;
 typedef long long unsigned int size_t;
 typedef unsigned long long uint64_t;
+typedef long long int64_t;
 
 // refs: https://wiki.osdev.org/PC_Screen_Font
 typedef struct {
@@ -19,3 +22,5 @@ typedef struct {
   uint32_t width;
   uint8_t glyphs;
 } PSF_font;
+
+#define BREAD_MAGIC 0xB2EAD2EAL
