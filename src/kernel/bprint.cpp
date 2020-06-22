@@ -90,7 +90,8 @@ void Printer::next_line() {
 }
 
 Printer::Printer() : pos_x(0), pos_y(0) {
-  buffer = static_cast<char *>(kernel::unsafe_malloc(BUFFER_SIZE));
+  // fixme
+  //  buffer = static_cast<char *>(kernel::unsafe_malloc(BUFFER_SIZE));
 }
 
 }  // namespace bread_os

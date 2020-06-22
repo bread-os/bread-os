@@ -15,13 +15,9 @@ class MemoryManager {
     return _printer;
   }
   static void init_memory_manager();
-  static void *malloc(size_t size);
-  static bool free(void *ptr);
-
-  bool register_memory(uint64_t ptr, size_t size);
 
  private:
-  MemoryManager();
+  MemoryManager() = default;
 };
 
 class MemoryChunk {
