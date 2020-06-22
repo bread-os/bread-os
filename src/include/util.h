@@ -25,6 +25,16 @@ char *strchr(const char *s, const char c);
 template<typename Type>
 void swap(Type &a, Type &b);
 
+template<typename T, typename U>
+auto min(T x, U y) -> decltype(x > y ? x : y) {
+  return x < y ? x : y;
+}
+
+template<typename T, typename U>
+auto max(T x, U y) -> decltype(x > y ? x : y) {
+  return x > y ? x : y;
+}
+
 template<typename T, size_t N>
 constexpr size_t arraysize(const T (&)[N]) {
   return N;
