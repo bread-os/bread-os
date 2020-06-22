@@ -3,6 +3,7 @@
 mkdir -p out/uefi
 mkdir -p out/uefi/EFI/BOOT
 mkdir -p out/uefi/BOOTBOOT
+mkdir -p out/mnt
 
 # make kernel
 mkdir -p out/initrd out/initrd/sys
@@ -30,10 +31,10 @@ dd if=out/temp.img of=out/uefi.img bs=512 count=91669 seek=2048 conv=notrunc
 rm out/temp.img
 
 ## Copy UEFI files
-# tip: I use loop9, you can change it
-sudo losetup --offset 1048576 --sizelimit 46934528 /dev/loop9 out/uefi.img
-sudo mount /dev/loop9 /mnt
+# tip: I use loop10, you can change it
+sudo losetup --offset 1048576 --sizelimit 46934528 /dev/loop10 out/uefi.img
+sudo mount /dev/loop10 out/mnt
 # copy files
-sudo cp -r out/uefi/* /mnt/
-sudo umount /mnt
-sudo losetup -d /dev/loop9
+sudo cp -r out/uefi/* out/mnt/
+sudo umount out/mnt
+sudo losetup -d /dev/loop10
