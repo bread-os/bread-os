@@ -5,7 +5,8 @@
 
 namespace bread_os {
 template<typename Arg, typename... Args>
-char *format(char *str, Arg &&arg, Args &&... args);
+char *format(char *str, Args &&... args);
+
 class Printer {
  public:
   static auto &instance() {
@@ -13,7 +14,7 @@ class Printer {
     return _printer;
   }
 
-  friend Printer &operator<<(Printer &, const char);
+  friend Printer &operator<<(Printer &, char);
   friend Printer &operator<<(Printer &, const char *);
 
  private:
