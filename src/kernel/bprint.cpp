@@ -4,8 +4,8 @@ namespace bread_os {
 void putchar(unsigned short int c, uint32_t cx, uint32_t cy,
     // todo: color
              uint32_t fg = 0xFFFFFF, uint32_t bg = 0) {
-  PSF_font *font = (PSF_font *) &_binary_font_psf_start;
-  uint32_t bytesperline = (font->width + 7) / 8;
+  auto *font = (PSF_font *) &_binary_font_psf_start;
+  uint32_t kBytesperline = (font->width + 7) / 8;
   unsigned char *glyph =
       (unsigned char *) &_binary_font_psf_start + font->headersize +
           (c > 0 && c < font->numglyph ? c : 0) * font->bytesperglyph;
@@ -20,7 +20,7 @@ void putchar(unsigned short int c, uint32_t cx, uint32_t cy,
       mask >>= 1U;
       line += 4;
     }
-    glyph += bytesperline;
+    glyph += kBytesperline;
     offs += bootboot.fb_scanline;
   }
 }
@@ -90,8 +90,7 @@ void Printer::next_line() {
 }
 
 Printer::Printer() : pos_x(0), pos_y(0) {
-  // fixme
-  //  buffer = static_cast<char *>(kernel::unsafe_malloc(BUFFER_SIZE));
+  buffer = static_cast<char *>(MemoryManager::instance().b_malloc(BUFFER_SIZE));
 }
 
 }  // namespace bread_os

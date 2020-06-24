@@ -4,26 +4,17 @@
 #include <util.h>
 
 namespace bread_os {
-namespace kernel {
-void *unsafe_malloc(size_t size);
-}  // namespace kernel
-
 class MemoryManager {
  public:
   static auto &instance() {
-    static MemoryManager _printer;
-    return _printer;
+    static MemoryManager _mm;
+    return _mm;
   }
   static void init_memory_manager();
+  void *b_malloc(size_t size);
 
  private:
   MemoryManager() = default;
-};
-
-class MemoryChunk {
- public:
-  uint64_t ptr;
-  size_t size;
 };
 
 class PhysicalMemoryPage {
