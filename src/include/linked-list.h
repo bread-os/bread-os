@@ -1,33 +1,35 @@
 #pragma once
 #include <bstddef.h>
 
-template<typename T>
 class ListItem {
-  explicit ListItem(T &value);
+ public:
+  explicit ListItem(void *value);
+  static void clean_up(ListItem *item);
+
+  // remove this from the list
+  void remove() const;
 
   ListItem *prev, *next;
   // wrapped value
-  T &value;
+  void *value;
 };
 
-template<typename T>
 class LinkedList {
  public:
-  typedef ListItem<T> Item;
-  typedef void travel_callback(Item &);
-  typedef bool compare_callback(const Item &);
+  typedef void travel_callback(ListItem &);
+  typedef bool compare_callback(const ListItem &);
   LinkedList();
   ~LinkedList();
 
   size_t length();
 
-  Item *prepend(Item *item);
-  Item *append(Item *item);
+  ListItem *prepend(ListItem *item);
+  ListItem *append(ListItem *item);
 
   void travel(travel_callback cb);
   void remove(compare_callback cb);
 
  private:
-  Item *_head, *_tail;
+  ListItem *_head, *_tail;
   size_t _size;
 };

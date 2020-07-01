@@ -12,6 +12,8 @@ class MemoryManager {
     return _mm;
   }
   static void init_memory_manager();
+
+  // unsafe
   void *b_malloc(size_t size);
 
  private:
@@ -21,21 +23,20 @@ class MemoryManager {
 class PhysicalMemoryPage {
  public:
   PhysicalMemoryPage() {
-    this->fist_ptr = 0;
+    this->first_ptr = 0;
     this->used_size = 0;
-    this->used = false;
   }
   explicit PhysicalMemoryPage(size_t used) {
-    this->fist_ptr = 0;
+    this->first_ptr = 0;
     this->used_size = 0 + used;
-    this->used = false;
   };
 
+  uint64_t current_ptr() { return first_ptr + used_size; }
+
   // the header of this page
-  uint64_t fist_ptr;
+  uint64_t first_ptr;
   // used size of the page
   size_t used_size;
-  bool used;
 
   // aligned with 4KB
   // see 'EFI_PHYSICAL_ADDRESS EFI_MEMORY_DESCRIPTOR'
@@ -49,12 +50,15 @@ class PhysicalMemoryManager {
     return _pmm;
   }
 
-  typedef LinkedList<PhysicalMemoryPage> PhysicalLinkedList;
-  PhysicalLinkedList *freePhysicalMemoryPageList;
-  PhysicalLinkedList *usedPhysicalMemoryPageList;
+  PhysicalMemoryPage *apply_page();
+  bool free_page(PhysicalMemoryPage *);
+
  private:
   PhysicalMemoryManager();
   // deconstruct function should be never called
   ~PhysicalMemoryManager() = default;
+  typedef LinkedList PhysicalLinkedList;
+  PhysicalLinkedList *usedPhysicalMemoryPageList;
+  PhysicalLinkedList *freePhysicalMemoryPageList;
 };
 }  // namespace bread_os
