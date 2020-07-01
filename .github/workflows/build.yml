@@ -10,6 +10,6 @@ jobs:
         with:
           submodules: true
       - name: Install Requirement
-        run: sudo apt install cmake make gcc g++ build-essential uuid-dev iasl python qemu qemu-kvm
+        run: sudo apt update && sudo apt install cmake make gcc g++ build-essential uuid-dev iasl python qemu qemu-kvm
       - name: Build Kernel with Makefile
         run: make kernel
