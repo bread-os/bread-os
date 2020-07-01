@@ -43,8 +43,8 @@ PhysicalMemoryManager::PhysicalMemoryManager() {
       static_cast<PhysicalLinkedList *>(memoryManager.b_malloc(sizeof(PhysicalLinkedList)));
 }
 
-PhysicalMemoryPage *PhysicalMemoryManager::apply_page() {
-  auto *page = static_cast<PhysicalMemoryPage *>(MemoryManager::instance().b_malloc(PhysicalMemoryPage::pageSize));
+PhysicalMemoryPage *PhysicalMemoryManager::apply_page(PageType pageType = PageType::normal) {
+  auto *page = static_cast<PhysicalMemoryPage *>(MemoryManager::instance().b_malloc(PhysicalMemoryPage::pageNormalSize));
   const size_t pageSize = sizeof(PhysicalMemoryPage);
   const size_t itemSize = sizeof(ListItem);
 

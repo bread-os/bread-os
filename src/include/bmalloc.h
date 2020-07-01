@@ -32,6 +32,9 @@ class PhysicalMemoryPage {
   };
 
   uint64_t current_ptr() { return first_ptr + used_size; }
+  size_t total_size() {
+    return PhysicalMemoryPage::pageNormalSize - this->first_ptr - reinterpret_cast<uint64_t>(this);
+  };
 
   // the header of this page
   uint64_t first_ptr;
@@ -40,7 +43,8 @@ class PhysicalMemoryPage {
 
   // aligned with 4KB
   // see 'EFI_PHYSICAL_ADDRESS EFI_MEMORY_DESCRIPTOR'
-  static constexpr const size_t pageSize = 4096;
+  static constexpr const size_t pageNormalSize = 4096;  // 4KB
+  static constexpr const size_t pageLargeSize = 4.194e+6; // 4MB
 };
 
 class PhysicalMemoryManager {
@@ -50,7 +54,12 @@ class PhysicalMemoryManager {
     return _pmm;
   }
 
-  PhysicalMemoryPage *apply_page();
+  enum class PageType {
+    normal,
+    large
+  };
+
+  PhysicalMemoryPage *apply_page(PageType pageType);
   bool free_page(PhysicalMemoryPage *);
 
  private:
