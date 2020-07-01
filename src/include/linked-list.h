@@ -3,11 +3,11 @@
 
 template<typename T>
 class ListItem {
-  ListItem(T value);
+  explicit ListItem(T &value);
 
   ListItem *prev, *next;
   // wrapped value
-  T value;
+  T &value;
 };
 
 template<typename T>
@@ -29,4 +29,5 @@ class LinkedList {
 
  private:
   Item *_head, *_tail;
+  size_t _size;
 };
