@@ -14,7 +14,7 @@ file(GLOB KERNEL_OBJECTS src/kernel/*.cpp)
 
 add_executable(kernel.elf src/boot/boot.cpp font/font.o ${KERNEL_OBJECTS})
 include_directories(BEFORE
-        src/include deps/bootboot)
+        src/include deps/bootboot/dist)
 
 add_custom_command(TARGET kernel.elf POST_BUILD
         COMMAND objcopy --only-keep-debug kernel.elf kernel.sym
