@@ -1,5 +1,6 @@
 #include <bmalloc.h>
 namespace bread_os {
+static uint64_t memory_ptr = bootboot.initrd_ptr + bootboot.initrd_size;
 static size_t total_memories = 0;
 static MMapEnt *current_mmap = nullptr;
 static uint64_t current_ptr = 0;
@@ -44,15 +45,15 @@ PhysicalMemoryManager::PhysicalMemoryManager() {
 }
 
 PhysicalMemoryPage *PhysicalMemoryManager::apply_page(PageType pageType = PageType::normal) {
-  auto *page = static_cast<PhysicalMemoryPage *>(MemoryManager::instance().b_malloc(PhysicalMemoryPage::pageNormalSize));
-  const size_t pageSize = sizeof(PhysicalMemoryPage);
-  const size_t itemSize = sizeof(ListItem);
+  // todo: allow the pageLargeSize
+  auto pageSize = PhysicalMemoryPage::pageNormalSize;
+  auto *page = static_cast<PhysicalMemoryPage *>(MemoryManager::instance().b_malloc(pageSize));
 
-  page->first_ptr = reinterpret_cast<int64_t>(page) + pageSize;
-  auto *item = reinterpret_cast<ListItem *>(page->first_ptr);
+  page->first_ptr = current_ptr - pageSize;
+  auto *item = reinterpret_cast<ListItem *>(memory_ptr);
+  memory_ptr += sizeof(void *); // increase the memory pointer
   ListItem::clean_up(item);
   item->value = page;
-  page->first_ptr += itemSize;
   page->used_size = 0;
 
   this->usedPhysicalMemoryPageList->append(item);
