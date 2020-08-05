@@ -43,7 +43,7 @@ If there have any `socket` problem, make sure you network connection.
 
 - how to build `edk2`
 
-There are many tutorials, for example: [UEFI-EDK2](https://wiki.ubuntu.com/UEFI/EDK2)(for Ubuntu only, but Windows user also could learn how to do)
+There are many tutorials, for example: [UEFI-EDK2](https://wiki.ubuntu.com/UEFI/EDK2) (for Ubuntu only, but Windows user also could learn how to do)
 
 ## LICENSE
 
