@@ -13,6 +13,7 @@ typedef unsigned long long uint64_t;
 extern BOOTBOOT bootboot;
 extern unsigned char *environment;
 extern uint8_t fb;
+
 extern volatile unsigned char _binary_font_psf_start;
 extern volatile unsigned char _binary_font_psf_end;
 

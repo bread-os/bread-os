@@ -7,7 +7,7 @@ PHDRS
 SECTIONS
 {
     . = 0xffffffffffe00000;
-    bootboot    = .; . += 4096;
+    bootboot    = .; . += 4060;
     environment = .; . += 4096;
     .text : {
         KEEP(*(.text.boot)) *(.text .text.*)   /* code */

@@ -21,5 +21,6 @@ add_custom_command(TARGET kernel.elf POST_BUILD
         COMMAND objdump -C -d -S --no-show-raw-insn kernel.elf > kernel.lst
         COMMAND objdump -C -d kernel.elf > kernel.asm
         COMMAND nm -C kernel.elf | sort | uniq > kernel.sym.txt
-        COMMAND strip kernel.elf
+        COMMAND strip -s -K mmio -K fb -K bootboot -K environment kernel.elf
+        COMMAND readelf -hls kernel.elf > kernel.elf.txt
         )

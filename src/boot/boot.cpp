@@ -5,7 +5,7 @@
 #include <util.h>
 
 // entry point
-extern "C" void _start() {
+void _start() {
   using namespace bread_os;
   auto &printer = Printer::instance();
   printer << "Hello, world!\n";
