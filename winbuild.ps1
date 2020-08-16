@@ -1,5 +1,5 @@
 param (
-    [string]$command = "build",
+    [switch]$build = $false,
     [switch]$debug = $false
 )
 
@@ -45,15 +45,22 @@ function SetEnv()
     }
 }
 
-Write-Host "vcbuild.ps1 starting..."
+DebugLog "vcbuild.ps1 starting..."
 SetEnv
-switch ($command)
+if ($build)
 {
-    "build" {
-        # todo
-    }
-    Default {
-    }
+    Write-Host "start building..."
+    wsl.exe make all
+    Write-Host "build success!"
+}
+else
+{
+    Write-Host "Usage: winbuild.ps1 [options] [arguments]"
+    Write-Host "Example:"
+    Write-Host "    winbuild.ps1 -build -debug"
+    Write-Host "Options:"
+    Write-Host "    -build `t` build porject"
+    Write-Host "    -debug `t` enable debug logger"
 }
 
-Write-Host "vcbuild.ps1 exit"
+DebugLog "vcbuild.ps1 exit"
