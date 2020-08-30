@@ -1,5 +1,6 @@
 param (
     [switch]$build = $false,
+    [switch]$start = $false,
     [switch]$debug = $false
 )
 
@@ -50,8 +51,24 @@ SetEnv
 if ($build)
 {
     Write-Host "start building..."
-    wsl.exe make all
+    if ($null -ne $args)
+    {
+        wsl.exe make $args
+    }
+    else
+    {
+        wsl.exe make all
+    }
     Write-Host "build success!"
+}
+elseif ($start)
+{
+    Write-Host "start qemu"
+    qemu-system-x86_64 `
+        -cpu qemu64 -cpu qemu64 `
+        -bios $Env:OVMF_PATH `
+        -drive file=$Env:OUTPUT_DIR/uefi.img,format=raw,if=ide `
+        -net none
 }
 else
 {

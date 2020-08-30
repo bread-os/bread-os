@@ -1,40 +1,43 @@
 ## UEFI files preparation
+source .env
+
 # generate UEFI bootable dir
-mkdir -p out/uefi
-mkdir -p out/uefi/EFI/BOOT
-mkdir -p out/uefi/BOOTBOOT
-mkdir -p out/mnt
+mkdir -p ${OUTPUT_DIR}/uefi ${OUTPUT_DIR}/uefi/EFI/BOOT ${OUTPUT_DIR}/uefi/BOOTBOOT ${OUTPUT_DIR}/mnt
+# generate kernel dir
+mkdir -p ${OUTPUT_DIR}/initrd ${OUTPUT_DIR}/initrd/sys
 
-# make kernel
-mkdir -p out/initrd out/initrd/sys
+# todo: use env variables, auto switch 'CMAKE_DEBUG_DIR' and 'CMAKE_RELEASE_DIR'
+#  currently we don't use CMAKE_RELEASE_DIR for no release outputs.
+# tip: use sys/core as the entry point
+cp ${CMAKE_DEBUG_DIR}/kernel.elf ${OUTPUT_DIR}/initrd/sys/core
 
-# fixme: use env variables
-cp cmake-build-debug/kernel.elf out/initrd/sys/core # tip: use sys/core as the entry point
-cd out/initrd && (find . | cpio -H hpodc -o | gzip >../initrd.bin) && cd ../..
-rm -rf out/initrd # remove tmp dir
-cp out/initrd.bin out/uefi/BOOTBOOT/INITRD
+# zip files inside 'initrd'
+cd ${OUTPUT_DIR}/initrd && (find . | cpio -H hpodc -o | gzip >../initrd.bin) && cd ../..
+rm -rf ${OUTPUT_DIR}/initrd # remove tmp dir
+# cp initrd.bin for bootboot format
+cp ${OUTPUT_DIR}/initrd.bin ${OUTPUT_DIR}/uefi/BOOTBOOT/INITRD
 
 # copy bootboot files
-cp deps/bootboot/dist/bootboot.efi out/uefi/EFI/BOOT/BOOTX64.EFI
-cp deps/bootboot/dist/bootboot.bin out/uefi/BOOTBOOT/LOADER
-cp build/config.txt out/uefi/BOOTBOOT/CONFIG  # config file
+cp ${BOOTBOOT_EFI} ${OUTPUT_DIR}/uefi/EFI/BOOT/BOOTX64.EFI
+cp ${BOOTBOOT_BIN} ${OUTPUT_DIR}/uefi/BOOTBOOT/LOADER
+cp build/config.txt ${OUTPUT_DIR}/uefi/BOOTBOOT/CONFIG  # config file
 
 ## Image generate
-dd if=/dev/zero of=out/uefi.img bs=512 count=93750
-parted out/uefi.img -s -a minimal mklabel gpt
-parted out/uefi.img -s -a minimal mkpart EFI FAT32 2048s 93716s
-parted out/uefi.img -s -a minimal toggle 1 boot
-dd if=/dev/zero of=out/temp.img bs=512 count=91669
-mformat -i out/temp.img -h 32 -t 32 -n 64 -c 1
+dd if=/dev/zero of=${OUTPUT_DIR}/uefi.img bs=512 count=93750
+parted ${OUTPUT_DIR}/uefi.img -s -a minimal mklabel gpt
+parted ${OUTPUT_DIR}/uefi.img -s -a minimal mkpart EFI FAT32 2048s 93716s
+parted ${OUTPUT_DIR}/uefi.img -s -a minimal toggle 1 boot
+dd if=/dev/zero of=${OUTPUT_DIR}/temp.img bs=512 count=91669
+mformat -i ${OUTPUT_DIR}/temp.img -h 32 -t 32 -n 64 -c 1
 
-dd if=out/temp.img of=out/uefi.img bs=512 count=91669 seek=2048 conv=notrunc
-rm out/temp.img
+dd if=${OUTPUT_DIR}/temp.img of=${OUTPUT_DIR}/uefi.img bs=512 count=91669 seek=2048 conv=notrunc
+rm ${OUTPUT_DIR}/temp.img
 
 ## Copy UEFI files
 # tip: I use loop10, you can change it
-sudo losetup --offset 1048576 --sizelimit 46934528 /dev/loop10 out/uefi.img
-sudo mount /dev/loop10 out/mnt
+sudo losetup --offset 1048576 --sizelimit 46934528 /dev/loop10 ${OUTPUT_DIR}/uefi.img
+sudo mount /dev/loop10 ${OUTPUT_DIR}/mnt
 # copy files
-sudo cp -r out/uefi/* out/mnt/
-sudo umount out/mnt
+sudo cp -r ${OUTPUT_DIR}/uefi/* ${OUTPUT_DIR}/mnt/
+sudo umount ${OUTPUT_DIR}/mnt
 sudo losetup -d /dev/loop10

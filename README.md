@@ -10,6 +10,11 @@ We only support
 [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
 on Windows10.
 
+```powershell
+winbuild.ps1 -build # build project
+winbuild.ps1 -start # start using qemu on Windows
+```
+
 ### Linux
 
 Fow now, we use Linux to compile `*.cpp` files and link binaries.

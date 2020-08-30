@@ -10,12 +10,12 @@ kernel: font.o
 	@cd ${CMAKE_DEBUG_DIR} && cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" .. && make
 
 uefi: kernel
-	@sh build/make-uefi.sh
+	@bash build/make-uefi.sh
 
 start: all uefi
 	qemu-system-x86_64 -cpu qemu64 \
 		-cpu qemu64 -bios ${OVMF_PATH} \
-		-drive file=${OUTPUT_DIR}/uefi.img,if=ide \
+		-drive file=${OUTPUT_DIR}/uefi.img,format=raw,if=ide \
   		-net none
 
 font.o:
