@@ -11,7 +11,9 @@ OBJS=$(KERNEL_FILES:.c=.o)
 
 TARGET=kernel
 
-all: $(TARGET)
+all:
+	mkdir -p ${OUTPUT_DIR}
+	make $(TARGET)
 
 kernel: $(OBJS)
 	gcc ${C_FLAGS} ${INCLUDES} -o ${OUTPUT_DIR}/main64.o -c $(EFI_MAIN) ${OUTPUT_DIR}/$(notdir $(OBJS))
