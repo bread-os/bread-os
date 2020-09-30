@@ -1,7 +1,8 @@
 #include <Uefi.h>
+#include "sys.h"
 
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
-  (void) ImageHandle;
+  global_env->st = SystemTable;
   EFI_STATUS Status;
   EFI_INPUT_KEY Key;
 
