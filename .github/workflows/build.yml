@@ -10,6 +10,6 @@ jobs:
         with:
           submodules: true
       - name: Install Requirement
-        run: sudo apt update && sudo apt install make gcc g++ build-essential
+        run: sudo apt update && sudo apt install make gcc g++ build-essential gnu-efi
       - name: Build Kernel and Bootable Image with Makefile
         run: sudo make all
