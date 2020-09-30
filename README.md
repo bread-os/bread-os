@@ -1,6 +1,6 @@
 # Bread-OS
 
-> BREAD operate system based on X86_64
+> BREAD operate system based on X86_64, using UEFI boot loader
 
 ## Build
 
@@ -17,11 +17,11 @@ winbuild.ps1 -start # start using qemu on Windows
 
 ### Linux
 
-Fow now, we use Linux to compile `*.cpp` files and link binaries.
+Fow now, we use Linux to compile `*.c` files and link binaries.
 
 ```shell script
 # include deps requirements
-apt install cmake make gcc g++ nasm qemu qemu-kvm build-essential git uuid-dev iasl python
+apt install make gcc g++ nasm qemu qemu-kvm build-essential git uuid-dev iasl python
 # build all
 make all
 # start bread-os using qemu-system-x86_64
@@ -31,8 +31,6 @@ make start
 ## Dependencies
 
 Make sure following dependencies have installed.
-
-- [bootboot](https://gitlab.com/bztsrc/bootboot): for micro-kernel loader
 
 - [edk2](https://github.com/tianocore/edk2): development environment for the UEFI
 
