@@ -1,6 +1,7 @@
 #ifndef BREAD_OS_SRC_INCLUDE_UTIL_H_
 #define BREAD_OS_SRC_INCLUDE_UTIL_H_
 #include <Uefi.h>
+#include <stdint.h>
 
 #define CHECK_STATUS_MESSAGE(exp, message)                                                \
   do {                                                                                    \
