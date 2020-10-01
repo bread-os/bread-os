@@ -9,7 +9,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+      - uses: actions-rs/toolchain@v1
+          with:
+            toolchain: stable
       - name: Install Requirement
         run: sudo apt update && sudo apt install make gcc g++ build-essential gnu-efi
-      - name: Build Kernel
+      - name: Build kernel
         run: sudo make all
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release

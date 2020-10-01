@@ -1,0 +1,31 @@
+{
+  "llvm-target": "x86_64-unknown-none",
+  "data-layout": "e-m:e-i64:64-f80:128-n8:16:32:64-S128",
+  "arch": "x86_64",
+  "target-endian": "little",
+  "target-pointer-width": "64",
+  "target-c-int-width": "32",
+  "os": "none",
+  "executables": true,
+  "linker-flavor": "ld.lld",
+  "linker": "rust-lld",
+  "panic-strategy": "abort",
+  "disable-redzone": true,
+  "features": "-mmx,-sse,+soft-float",
+  "dynamic-linking": false,
+  "relocation-model": "pic",
+  "code-model": "kernel",
+  "eliminate-frame-pointer": false,
+  "exe-suffix": "",
+  "has-rpath": false,
+  "no-compiler-rt": true,
+  "no-default-libraries": true,
+  "position-independent-executables": false,
+  "has-elf-tls": true,
+  "pre-link-args": {
+    "ld.lld": [
+      "--script=./triplets/mykernel.ld",
+      "./font.o"
+    ]
+  }
+}
