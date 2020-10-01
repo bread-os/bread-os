@@ -3,10 +3,9 @@ C_FLAGS=-nostdlib -shared -ffreestanding -fpic -fno-stack-protector -fshort-wcha
 EFI_MAIN=src/boot/efi_main.c
 LD_SCRIPT=src/boot/elf_x86_64_efi.lds
 
-INCLUDES_FILES=deps/edk2/MdePkg/Include/X64 deps/edk2/MdePkg/Include src/include
 KERNEL_FILES=src/kernel/sys.c
 
-INCLUDES=${foreach dir, $(INCLUDES_FILES), -I ${dir}}
+INCLUDES=${foreach dir, $(INCLUDES_DIR), -I ${dir}}
 OBJS=$(KERNEL_FILES:.c=.o)
 
 TARGET=kernel
