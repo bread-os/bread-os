@@ -5,7 +5,7 @@ LD_SCRIPT=src/boot/elf_x86_64_efi.lds
 
 KERNEL_FILES=src/kernel/sys.c
 
-INCLUDES=${foreach dir, $(INCLUDES_DIR), -I ${dir}}
+INCLUDES=${foreach dir, $(INCLUDE_DIR), -I ${dir}}
 OBJS=$(KERNEL_FILES:.c=.o)
 
 TARGET=kernel
