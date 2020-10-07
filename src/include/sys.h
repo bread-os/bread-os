@@ -1,5 +1,4 @@
-#ifndef BREAD_OS_SRC_KERNEL_SYS_H_
-#define BREAD_OS_SRC_KERNEL_SYS_H_
+#pragma once
 #include <Uefi.h>
 #include "util.h"
 
@@ -34,4 +33,4 @@ struct IDTDescriptor {
 } __attribute__((packed));
 typedef struct IDTDescriptor IDTDescriptor;
 
-#endif //BREAD_OS_SRC_KERNEL_SYS_H_
+void gdb_log(CHAR16 *str, ...);

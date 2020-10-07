@@ -1,4 +1,5 @@
 #include <Uefi.h>
+#include "vmem_map.h"
 #include "sys.h"
 
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {

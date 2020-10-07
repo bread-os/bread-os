@@ -3,7 +3,7 @@ C_FLAGS=-nostdlib -shared -ffreestanding -fpic -fno-stack-protector -fshort-wcha
 EFI_MAIN=src/boot/efi_main.c
 LD_SCRIPT=src/boot/elf_x86_64_efi.lds
 
-KERNEL_FILES=src/kernel/sys.c
+KERNEL_FILES=src/kernel/sys.c src/kernel/vmem_map.c
 
 INCLUDES=${foreach dir, $(INCLUDE_DIR), -I ${dir}}
 OBJS=$(KERNEL_FILES:.c=.o)
@@ -15,7 +15,7 @@ all:
 	make $(TARGET)
 
 kernel: $(OBJS)
-	gcc ${C_FLAGS} ${INCLUDES} -o ${OUTPUT_DIR}/main64.o -c $(EFI_MAIN) ${OUTPUT_DIR}/$(notdir $(OBJS))
+	gcc ${C_FLAGS} ${INCLUDES} -o ${OUTPUT_DIR}/main64.o -c $(EFI_MAIN) ${foreach obj, $(notdir $(OBJS)), ${OUTPUT_DIR}/${obj}}
 	gcc -nostdlib -shared -L /usr/lib -l:libgnuefi.a  -l:libefi.a -Wl,-T,${LD_SCRIPT},--build-id=none -Wl,-Bsymbolic -Wl,-znocombreloc -o ${OUTPUT_DIR}/kernel_x64.elf ${OUTPUT_DIR}/main64.o -lgcc
 	objcopy -I elf64-x86-64 -O efi-app-x86_64 ${OUTPUT_DIR}/kernel_x64.elf ${OUTPUT_DIR}/BOOTX64.EFI
 
