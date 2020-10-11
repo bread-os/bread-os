@@ -53,6 +53,8 @@ OBJS=$(KERNEL_FILES:.c=.o)
 
 LIBS			+= $(OBJS)
 
+PYTHON=python3
+
 ifeq (, $(shell which $(CC)))
   $(error The selected compiler ($(CC)) was not found)
 endif
@@ -97,7 +99,7 @@ main.efi: $(OBJS)
 
 qemu: CFLAGS += -D_DEBUG
 qemu: all $(FW_BASE)_$(FW_ARCH).fd image/efi/boot/boot$(ARCH).efi
-	$(QEMU) $(QEMU_OPTS) -bios ./$(FW_BASE)_$(FW_ARCH).fd -net none -hda fat:rw:image
+	@$(PYTHON) $(CURDIR)/build/start-qemu.py
 
 image/efi/boot/boot$(ARCH).efi: main.efi
 	mkdir -p image/efi/boot
