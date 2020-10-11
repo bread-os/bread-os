@@ -10,6 +10,6 @@ jobs:
         with:
           submodules: true
       - name: Install Requirement
-        run: sudo apt update && sudo apt install make gcc g++ build-essential gnu-efi
+        run: sudo apt install make gcc g++ build-essential gnu-efi mingw-w64
       - name: Build Kernel
         run: sudo make all
