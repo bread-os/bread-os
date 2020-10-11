@@ -1,3 +1,4 @@
+include .env
 ARCH            = x64
 # You can alter the subsystem according to your EFI binary target:
 # 10 = EFI application
