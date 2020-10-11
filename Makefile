@@ -101,6 +101,9 @@ qemu: CFLAGS += -D_DEBUG
 qemu: all $(FW_BASE)_$(FW_ARCH).fd image/efi/boot/boot$(ARCH).efi
 	@$(PYTHON) $(CURDIR)/build/start-qemu.py
 
+image: all $(FW_BASE)_$(FW_ARCH).fd image/efi/boot/boot$(ARCH).efi
+	@$(sh) build/make-img.sh
+
 image/efi/boot/boot$(ARCH).efi: main.efi
 	mkdir -p image/efi/boot
 	cp -f $< $@

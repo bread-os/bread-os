@@ -9,6 +9,7 @@ image
 # uefi files
 *.zip
 OVMF_X64.fd
+*.img
 
 # dialog dir
 debug

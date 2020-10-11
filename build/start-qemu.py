@@ -13,6 +13,7 @@ QEMU = 'qemu-system-{arch}{suffix}'.format(arch=QEMU_ARCH, suffix=(".exe" if IS_
 
 def main(argv):
     """Run the qemu"""
+    # "-drive", "file=fat.img,format=raw,if=ide"
     sp.run([QEMU, "-bios", "./{}".format(FV), "-net", "none", "-hda", "fat:rw:image"])
 
 
