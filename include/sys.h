@@ -7,6 +7,7 @@ typedef struct {
 static environment *global_env;
 
 void gdb_log(CHAR16 *str, ...);
+void clean_log_cache();
 
 EFI_STATUS init_interrupts();
 

@@ -6,22 +6,102 @@ static const CHAR16 hex[] = {
     u'8', u'9', u'A', u'B', u'C', u'D', u'E', u'F',
 };
 
-static CHAR16 *buffer_memory = NULL;
+static CHAR16 buff[512];
+static UINT16 buff_pos = 0;
+
+void write_to_console(CHAR16 *str) {
+  uefi_call_wrapper(global_env->st->ConOut->OutputString, 2, global_env->st->ConOut, str);
+}
+void clean_log_cache() {
+  write_to_console(buff);
+}
 
 void gdb_log(CHAR16 *str, ...) {
-  if (buffer_memory == NULL) {
-    CHECK_STATUS(global_env->st->BootServices->AllocatePages(AllocateAnyPages,
-                                                             EfiBootServicesData,
-                                                             1,
-                                                             (EFI_PHYSICAL_ADDRESS *) &buffer_memory));
-  }
   va_list args;
-  UINT16 pos = 0;
   va_start(args, str);
+  UINT16 pos = buff_pos;
   while (*str) {
-    // todo
+#define CHECK_POS             \
+  while(0) {                  \
+    if (pos >= 511) {         \
+      buff[pos] = 0;          \
+      write_to_console(buff); \
+      pos = 0;                \
+    }                         \
   }
+
+#define NUM_CASE(_type)                                                        \
+  while (0) {                                                                  \
+    if (pos >= 511) {                                                          \
+      buff[pos] = 0;                                                           \
+      write_to_console(buff);                                                  \
+      pos = 0;                                                                 \
+    }                                                                          \
+    _type p = va_arg(args, _type);                                             \
+    if (p < 0) {                                                               \
+      buff[pos++] = u'-';                                                      \
+      p = p * (-1);                                                            \
+    }                                                                          \
+    _type tmp = p;                                                             \
+    uint32_t i = 1;                                                            \
+    while ((tmp /= 10))                                                        \
+      ++i;                                                                     \
+    pos += i;                                                                  \
+    CHECK_POS;                                                                 \
+    uint32_t j = pos;                                                          \
+    while (i) {                                                                \
+      tmp = p;                                                                 \
+      p /= 10;                                                                 \
+      tmp -= (p * 10);                                                         \
+      buff[--j] = u'0' + tmp;                                                  \
+      --i;                                                                     \
+    }                                                                          \
+    break;                                                                     \
+  }
+    CHECK_POS;
+    const CHAR16 ch = *str;
+    if (ch == u'%') {
+      const CHAR16 next_ch = *str;
+      if (next_ch == u's') {
+        // %s
+        CHAR16 *p = va_arg(args, CHAR16*);
+        while (p) {
+          CHECK_POS;
+          buff[pos++] = *p;
+          p++;
+        }
+      } else if (next_ch == u'p') {
+        uintptr_t p = (uintptr_t) va_arg(args, uintptr_t*);
+        buff[pos++] = '0';
+        CHECK_POS;
+        buff[pos++] = 'x';
+        for (uint32_t i = 0; i < 16; i++) {
+          CHECK_POS;
+          buff[pos++] = hex[p >> (60 - (i << 2)) & 15];
+        }
+      } else if (next_ch == u'i') {
+        NUM_CASE(int32_t);
+      } else if (next_ch == u'u') {
+        NUM_CASE(uint32_t);
+      } else if (next_ch == u'l') {
+        const CHAR16 nnext_ch = *str;
+        str++;
+        if (nnext_ch == 'i') {
+          NUM_CASE(int64_t);
+        } else if (nnext_ch == 'u') {
+          NUM_CASE(uint64_t);
+        }
+      }
+    } else {
+      buff[pos] = *str;
+      pos++;
+    }
+#undef NUM_CASE
+#undef CHECK_POS
+    str++;
+  } // end while
   va_end(args);
+  buff_pos = pos;
 }
 
 void unknown_handler();
