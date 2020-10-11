@@ -1,3 +1,6 @@
 [submodule "deps/edk2"]
 	path = deps/edk2
 	url = https://github.com/tianocore/edk2.git
+[submodule "deps/gnu-efi"]
+	path = deps/gnu-efi
+	url = git://git.code.sf.net/p/gnu-efi/code
