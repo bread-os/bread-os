@@ -10,11 +10,6 @@ We only support
 [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
 on Windows10.
 
-```powershell
-winbuild.ps1 -build # build project
-winbuild.ps1 -start # start using qemu on Windows
-```
-
 ### Linux
 
 Fow now, we use Linux to compile `*.c` files and link binaries.
@@ -32,7 +27,9 @@ make start
 
 Make sure following dependencies have installed.
 
-- [edk2](https://github.com/tianocore/edk2): development environment for the UEFI
+- [edk2](https://github.com/tianocore/edk2): a large, complex environment with its own build system. Currently we build `OVMF.fd` on it
+
+- [gnu-efi](https://sourceforge.net/p/gnu-efi/code/ci/master/tree/) a very lightweight developing environment to create UEFI applications.
 
 ## Troubleshooting
 

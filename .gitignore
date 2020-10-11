@@ -3,6 +3,12 @@ out
 target
 cmake-build-debug
 cmake-build-release
+*.efi
+*.o
+image
+# uefi files
+*.zip
+OVMF_X64.fd
 
 # dialog dir
 debug

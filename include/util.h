@@ -1,6 +1,6 @@
 #pragma once
-#include <Uefi.h>
-#include "types.h"
+#include <efi.h>
+#include <efilib.h>
 
 #define CHECK_STATUS_MESSAGE(exp, message)                                                \
   do {                                                                                    \

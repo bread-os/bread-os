@@ -1,38 +1,114 @@
-include .env
-C_FLAGS=-nostdlib -shared -ffreestanding -fpic -fno-stack-protector -fshort-wchar -mno-red-zone -mgeneral-regs-only -mabi=ms -Wall -Wextra -Wpedantic -Wimplicit-function-declaration
-EFI_MAIN=src/boot/efi_main.c
-LD_SCRIPT=src/boot/elf_x86_64_efi.lds
+ARCH            = x64
+# You can alter the subsystem according to your EFI binary target:
+# 10 = EFI application
+# 11 = EFI boot service driver
+# 12 = EFI runtime driver
+SUBSYSTEM       = 10
 
-KERNEL_FILES=src/kernel/sys.c src/kernel/vmem_map.c
+MINGW_HOST    	= w64
+GNUEFI_ARCH   	= x86_64
+GCC_ARCH      	= x86_64
+QEMU_ARCH     	= x86_64
+FW_BASE       	= OVMF
+CROSS_COMPILE 	= $(GCC_ARCH)-$(MINGW_HOST)-mingw32-
+EP_PREFIX     	=
+CFLAGS        	= -m64 -mno-red-zone
+LDFLAGS       	= -Wl,-dll -Wl,--subsystem,$(SUBSYSTEM)
+FW_ARCH         = $(shell echo $(ARCH) | tr a-z A-Z)
+FW_ZIP          = $(FW_BASE)-$(FW_ARCH).zip
+GNUEFI_DIR      = $(CURDIR)/deps/gnu-efi
+GNUEFI_LIBS     = lib
 
-INCLUDES=${foreach dir, $(INCLUDE_DIR), -I ${dir}}
+# If the compiler produces an elf binary, we need to fiddle with a PE crt0
+ifneq ($(CRT0_LIBS),)
+  CRT0_DIR      = $(GNUEFI_DIR)/$(GNUEFI_ARCH)/gnuefi
+  LDFLAGS      += -L$(CRT0_DIR) -T $(GNUEFI_DIR)/gnuefi/elf_$(GNUEFI_ARCH)_efi.lds $(CRT0_DIR)/crt0-efi-$(GNUEFI_ARCH).o
+  GNUEFI_LIBS  += gnuefi
+endif
+
+# SYSTEMROOT is only defined on Windows systems
+ifneq ($(SYSTEMROOT),)
+  QEMU          = "/c/Program Files/qemu/qemu-system-$(QEMU_ARCH)w.exe"
+  # MinGW on Windows doesn't use (tuple)-ar but (tuple)-gcc-ar
+  # so we remove the cross compiler tuple altogether
+  CROSS_COMPILE =
+else
+  QEMU          = qemu-system-$(QEMU_ARCH) -nographic
+endif
+
+CC             	:= $(CROSS_COMPILE)gcc
+OBJCOPY        	:= $(CROSS_COMPILE)objcopy
+CFLAGS         	+= -fno-stack-protector -Wshadow -Wall -Wunused -Werror-implicit-function-declaration
+CFLAGS         	+= -I$(GNUEFI_DIR)/inc -I$(GNUEFI_DIR)/inc/$(GNUEFI_ARCH) -I$(GNUEFI_DIR)/inc/protocol
+CFLAGS			+= -I$(CURDIR)/include
+CFLAGS         	+= -DCONFIG_$(GNUEFI_ARCH) -D__MAKEWITH_GNUEFI -DGNU_EFI_USE_MS_ABI
+LDFLAGS        	+= -L$(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib -e $(EP_PREFIX)efi_main
+LDFLAGS        	+= -s -Wl,-Bsymbolic -nostdlib -shared
+LIBS            = -lefi $(CRT0_LIBS)
+KERNEL_FILES	= kernel/sys.c
+KERNEL_FILES 	+= kernel/vmem_map.c
+
 OBJS=$(KERNEL_FILES:.c=.o)
 
-TARGET=kernel
+LIBS			+= $(OBJS)
 
-all:
-	mkdir -p ${OUTPUT_DIR}
-	make $(TARGET)
+ifeq (, $(shell which $(CC)))
+  $(error The selected compiler ($(CC)) was not found)
+endif
 
-kernel: $(OBJS)
-	gcc ${C_FLAGS} ${INCLUDES} -o ${OUTPUT_DIR}/main64.o -c $(EFI_MAIN) ${foreach obj, $(notdir $(OBJS)), ${OUTPUT_DIR}/${obj}}
-	gcc -nostdlib -shared -L /usr/lib -l:libgnuefi.a  -l:libefi.a -Wl,-T,${LD_SCRIPT},--build-id=none -Wl,-Bsymbolic -Wl,-znocombreloc -o ${OUTPUT_DIR}/kernel_x64.elf ${OUTPUT_DIR}/main64.o -lgcc
-	objcopy -I elf64-x86-64 -O efi-app-x86_64 ${OUTPUT_DIR}/kernel_x64.elf ${OUTPUT_DIR}/BOOTX64.EFI
+GCCVERSION     := $(shell $(CC) -dumpversion | cut -f1 -d.)
+GCCMINOR       := $(shell $(CC) -dumpversion | cut -f2 -d.)
+GCCMACHINE     := $(shell $(CC) -dumpmachine)
+GCCNEWENOUGH   := $(shell ( [ $(GCCVERSION) -gt "4" ]        \
+                          || ( [ $(GCCVERSION) -eq "4" ]     \
+                              && [ $(GCCMINOR) -ge "7" ] ) ) \
+                        && echo 1)
+ifneq ($(GCCNEWENOUGH),1)
+  $(error You need GCC 4.7 or later)
+endif
 
-%.o : %.c
-	gcc ${C_FLAGS} ${INCLUDES} -c $< -o ${OUTPUT_DIR}/$(notdir $@)
+ifneq ($(GCC_ARCH),$(findstring $(GCC_ARCH), $(GCCMACHINE)))
+  $(error The selected compiler ($(CC)) is not set for $(ARCH))
+endif
 
-uefi: kernel
-	bash build/make-uefi.sh
+.PHONY: all clean superclean
+all: $(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib/libefi.a main.efi
 
-start: all uefi
-	qemu-system-x86_64 -cpu qemu64 \
-		-cpu qemu64 \
-		-bios ${OVMF_PATH}/OVMF.fd \
-		-drive if=ide,format=raw,file=${OUTPUT_DIR}/fat.img \
-  		-net none
+$(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib/libefi.a:
+	$(MAKE) -C$(GNUEFI_DIR) CROSS_COMPILE=$(CROSS_COMPILE) ARCH=$(GNUEFI_ARCH) $(GNUEFI_LIBS)
 
-.PNONY: clean
+%.efi: %.o
+	@echo  [LD]  $(notdir $@)
+ifeq ($(CRT0_LIBS),)
+	@$(CC) $(LDFLAGS) $< -o $@ $(LIBS)
+else
+	@$(CC) $(LDFLAGS) $< -o $*.elf $(LIBS)
+	@$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel* \
+	            -j .rela* -j .reloc -j .eh_frame -O binary $*.elf $@
+	@rm -f $*.elf
+endif
+
+main.efi: $(OBJS)
+
+%.o: %.c
+	@echo  [CC]  $(notdir $@)
+	$(CC) $(CFLAGS) -ffreestanding -c $< -o $@
+
+qemu: CFLAGS += -D_DEBUG
+qemu: all $(FW_BASE)_$(FW_ARCH).fd image/efi/boot/boot$(ARCH).efi
+	$(QEMU) $(QEMU_OPTS) -bios ./$(FW_BASE)_$(FW_ARCH).fd -net none -hda fat:rw:image
+
+image/efi/boot/boot$(ARCH).efi: main.efi
+	mkdir -p image/efi/boot
+	cp -f $< $@
+
+$(FW_BASE)_$(FW_ARCH).fd:
+	mv $(OVMF_PATH)/OVMF.fd $(CURDIR)/OVMF_X64.fd
+
 clean:
-	@echo "remove all files in ${OUTPUT_DIR}"
-	@-rm -rf ${OUTPUT_DIR}/*
+	rm -f main.efi *.o kernel/*.o
+	rm -rf image
+
+superclean: clean
+	$(MAKE) -C$(GNUEFI_DIR) ARCH=$(GNUEFI_ARCH) clean
+	rm -f *.fd

@@ -1,5 +1,4 @@
 #pragma once
-#include <Uefi.h>
 #include "util.h"
 
 typedef struct {
