@@ -34,7 +34,7 @@ static CHAR16 buff[512];
 static UINT16 buff_pos = 0;
 
 #define CHECK_POS             \
-  do {                  \
+  do {                        \
     if (buff_pos >= 511) {    \
       buff[511] = 0;          \
       write_to_console(buff); \
@@ -61,7 +61,7 @@ void g_print(CHAR16 *str, ...) {
   va_start(args, str);
   while (*str) {
 #define NUM_CASE(type)                                                        \
-  do {                                                                 \
+  do {                                                                        \
     type p = va_arg(args, type);                                              \
     if (p < 0) {                                                              \
       putchar('-');                                                           \
