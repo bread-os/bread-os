@@ -6,10 +6,11 @@ typedef struct {
 } environment;
 static environment *global_env;
 
-void gdb_log(CHAR16 *str, ...);
+void g_print(CHAR16 *str, ...);
 void clean_log_cache();
 
 EFI_STATUS init_interrupts();
+void find_acpi2();
 
 struct IDT {
   uint16_t limit;
@@ -33,4 +34,4 @@ struct IDTDescriptor {
 } __attribute__((packed));
 typedef struct IDTDescriptor IDTDescriptor;
 
-void gdb_log(CHAR16 *str, ...);
+void g_print(CHAR16 *str, ...);

@@ -2,18 +2,24 @@
 #include <efilib.h>
 #include "sys.h"
 
+const static CHAR16 *os_name = L"bread-os";
+// 536237 in decimal
+const static int64_t magic_number = 0x82EAD;
+
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   global_env->st = SystemTable;
 #if defined(_GNU_EFI)
   InitializeLib(ImageHandle, SystemTable);
 #endif
   EFI_STATUS Status;
-  EFI_INPUT_KEY Key;
 
   uefi_call_wrapper(global_env->st->ConOut->Reset, 2, global_env->st->ConOut, FALSE);
-  gdb_log(L"Hello, world!\r\n");
-  gdb_log(L"This is second line");
-  gdb_log(L".");
+  g_print(L"OS name: %s\r\n", os_name);
+  g_print(L"os name address: %lu\r\n", magic_number);
+  g_print(L"Hello, world!\r\n");
+  g_print(L"This is second line");
+  g_print(L".\r\n");
+  find_acpi2();
   clean_log_cache();
 
   UINTN Event;

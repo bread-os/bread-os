@@ -9,99 +9,103 @@ static const CHAR16 hex[] = {
 static CHAR16 buff[512];
 static UINT16 buff_pos = 0;
 
-void write_to_console(CHAR16 *str) {
+#define CHECK_POS             \
+  do {                  \
+    if (buff_pos >= 511) {    \
+      buff[511] = 0;          \
+      write_to_console(buff); \
+      buff_pos = 0;           \
+    }                         \
+  } while (0);
+
+static void write_to_console(CHAR16 *str) {
   uefi_call_wrapper(global_env->st->ConOut->OutputString, 2, global_env->st->ConOut, str);
 }
+
+static void putchar(const CHAR16 ch) {
+  CHECK_POS;
+  buff[buff_pos++] = ch;
+}
+
 void clean_log_cache() {
+  putchar('\0');
   write_to_console(buff);
 }
 
-void gdb_log(CHAR16 *str, ...) {
+void g_print(CHAR16 *str, ...) {
   va_list args;
   va_start(args, str);
-  UINT16 pos = buff_pos;
   while (*str) {
-#define CHECK_POS             \
-  while(0) {                  \
-    if (pos >= 511) {         \
-      buff[pos] = 0;          \
-      write_to_console(buff); \
-      pos = 0;                \
-    }                         \
-  }
-
-#define NUM_CASE(_type)                                                        \
-  while (0) {                                                                  \
-    if (pos >= 511) {                                                          \
-      buff[pos] = 0;                                                           \
-      write_to_console(buff);                                                  \
-      pos = 0;                                                                 \
-    }                                                                          \
-    _type p = va_arg(args, _type);                                             \
-    if (p < 0) {                                                               \
-      buff[pos++] = u'-';                                                      \
-      p = p * (-1);                                                            \
-    }                                                                          \
-    _type tmp = p;                                                             \
-    uint32_t i = 1;                                                            \
-    while ((tmp /= 10))                                                        \
-      ++i;                                                                     \
-    pos += i;                                                                  \
-    CHECK_POS;                                                                 \
-    uint32_t j = pos;                                                          \
-    while (i) {                                                                \
-      tmp = p;                                                                 \
-      p /= 10;                                                                 \
-      tmp -= (p * 10);                                                         \
-      buff[--j] = u'0' + tmp;                                                  \
-      --i;                                                                     \
-    }                                                                          \
-    break;                                                                     \
-  }
-    CHECK_POS;
+#define NUM_CASE(type)                                                        \
+  do {                                                                 \
+    type p = va_arg(args, type);                                              \
+    if (p < 0) {                                                              \
+      putchar('-');                                                           \
+      p *= -1;                                                                \
+    }                                                                         \
+    type tmp = p;                                                             \
+    uint64_t len = 1;                                                         \
+    while ((tmp /= 10))                                                       \
+      ++len;                                                                  \
+    buff_pos += len;                                                          \
+    CHECK_POS;                                                                \
+    uint64_t j = buff_pos;                                                    \
+    while (len) {                                                             \
+      buff[--j] = u'0' + (p % 10);                                            \
+      p /= 10;                                                                \
+      len--;                                                                  \
+    }                                                                         \
+  } while (0);
     const CHAR16 ch = *str;
+    str++;
     if (ch == u'%') {
       const CHAR16 next_ch = *str;
+      str++;
       if (next_ch == u's') {
         // %s
         CHAR16 *p = va_arg(args, CHAR16*);
-        while (p) {
-          CHECK_POS;
-          buff[pos++] = *p;
+        while (*p) {
+          putchar(*p);
           p++;
         }
       } else if (next_ch == u'p') {
         uintptr_t p = (uintptr_t) va_arg(args, uintptr_t*);
-        buff[pos++] = '0';
-        CHECK_POS;
-        buff[pos++] = 'x';
-        for (uint32_t i = 0; i < 16; i++) {
-          CHECK_POS;
-          buff[pos++] = hex[p >> (60 - (i << 2)) & 15];
-        }
-      } else if (next_ch == u'i') {
+        putchar(u'0');
+        putchar(u'x');
+        for (uint32_t i = 0; i < 16; i++)
+          putchar(hex[p >> (60 - (i << 2)) & 15]);
+      } else if (next_ch == u'i' || next_ch == u'd') {
         NUM_CASE(int32_t);
       } else if (next_ch == u'u') {
         NUM_CASE(uint32_t);
       } else if (next_ch == u'l') {
         const CHAR16 nnext_ch = *str;
         str++;
-        if (nnext_ch == 'i') {
+        if (nnext_ch == u'i' || nnext_ch == u'd') {
           NUM_CASE(int64_t);
-        } else if (nnext_ch == 'u') {
+        } else if (nnext_ch == u'u') {
           NUM_CASE(uint64_t);
         }
       }
     } else {
-      buff[pos] = *str;
-      pos++;
+      putchar(ch);
     }
 #undef NUM_CASE
-#undef CHECK_POS
-    str++;
   } // end while
   va_end(args);
-  buff_pos = pos;
+}
+
+void find_acpi2() {
+  const EFI_GUID expected_table_guid = ACPI_20_TABLE_GUID;
+  EFI_CONFIGURATION_TABLE *configuration_tables = global_env->st->ConfigurationTable;
+  uint64_t length = global_env->st->NumberOfTableEntries;
+  for (uint64_t i = 0; i < length; i++) {
+    const EFI_CONFIGURATION_TABLE table = configuration_tables[i];
+    const EFI_GUID table_guid = configuration_tables[i].VendorGuid;
+    if (CompareMem(&table_guid, &expected_table_guid, sizeof(EFI_GUID)) == 0) {
+      g_print(L"debug: address: %p \r\n", table.VendorTable);
+    }
+  }
 }
 
 void unknown_handler();
@@ -145,3 +149,5 @@ __attribute__((naked)) void unknown_handler() {
 __attribute__((naked)) void int8_handler() {
 
 }
+
+#undef CHECK_POS
