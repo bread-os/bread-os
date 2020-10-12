@@ -92,6 +92,9 @@ else
 	@rm -f $*.elf
 endif
 
+debug: CFLAGS += -D_DEBUG
+debug: main.efi
+
 main.efi: $(OBJS)
 
 %.o: %.c
