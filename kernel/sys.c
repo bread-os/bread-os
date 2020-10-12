@@ -6,6 +6,30 @@ static const CHAR16 hex[] = {
     u'8', u'9', u'A', u'B', u'C', u'D', u'E', u'F',
 };
 
+const CHAR16 *memory_types[] = {
+    L"EfiReservedMemoryType",
+    L"EfiLoaderCode",
+    L"EfiLoaderData",
+    L"EfiBootServicesCode",
+    L"EfiBootServicesData",
+    L"EfiRuntimeServicesCode",
+    L"EfiRuntimeServicesData",
+    L"EfiConventionalMemory",
+    L"EfiUnusableMemory",
+    L"EfiACPIReclaimMemory",
+    L"EfiACPIMemoryNVS",
+    L"EfiMemoryMappedIO",
+    L"EfiMemoryMappedIOPortSpace",
+    L"EfiPalCode",
+};
+
+const CHAR16 *memory_type_to_str(UINT32 type) {
+  if (type > sizeof(memory_types) / sizeof(CHAR16 *))
+    return L"Unknown";
+  else
+    return memory_types[type];
+}
+
 static CHAR16 buff[512];
 static UINT16 buff_pos = 0;
 
@@ -108,45 +132,76 @@ void find_acpi2() {
   }
 }
 
-void unknown_handler();
-void int8_handler();
-
-EFI_STATUS init_interrupts() {
-  IDT idt = {0};
-  __asm__("sidt %0":"=m"(idt));
-  IDTDescriptor *idt_off = (struct IDTDescriptor *) idt.offset;
-
-  IDTDescriptor unknown_descriptor = {
-      .offset_1 = (uint64_t) unknown_handler & 0xFFFF,
-      .offset_2 = (((uint64_t) unknown_handler) >> 16) & 0xFFFF,
-      .offset_3 = (((uint64_t) unknown_handler) >> 32),
-      .selector = 0x28,
-      .zero = 0,
-      .flags = 0x8E00
-  };
-
-  for (int i = 32; i < 256; i += 1) {
-    idt_off[i] = unknown_descriptor;
+EFI_STATUS memory_map(EFI_MEMORY_DESCRIPTOR **map_buf,
+                      UINTN *map_size,
+                      UINTN *map_key,
+                      UINTN *desc_size,
+                      UINT32 *desc_version) {
+  EFI_STATUS err = EFI_SUCCESS;
+  *map_size = sizeof(**map_buf) * 31;
+  get_map:
+  *map_size += sizeof(**map_buf);
+  err = uefi_call_wrapper(BS->AllocatePool, 3, EfiLoaderData, *map_size, (void **) map_buf);
+  if (err != EFI_SUCCESS) {
+    Print(L"ERROR: Failed to allocate pool for memory map");
+    return err;
   }
 
-  // FIXME: we currently use int8 handler for all exception interrupts.
-  for (int i = 0; i < 20; i += 1) {
-    if (i == 9) continue;
-    idt_off[i].offset_1 = (uint64_t) int8_handler & 0xFFFF;
-    idt_off[i].offset_2 = (((uint64_t) int8_handler) >> 16) & 0xFFFF;
-    idt_off[i].offset_3 = (((uint64_t) int8_handler) >> 32);
-    idt_off[i].selector = 0x28;
-    idt_off[i].flags = 0x8E00;
+  err = uefi_call_wrapper(BS->GetMemoryMap, 5, map_size, *map_buf, map_key, desc_size, desc_version);
+  if (err != EFI_SUCCESS) {
+    if (err == EFI_BUFFER_TOO_SMALL) {
+      uefi_call_wrapper(BS->FreePool, 1, (void *) *map_buf);
+      goto get_map;
+    }
+    Print(L"ERROR: Failed to get memory map");
+  }
+  return err;
+}
+
+EFI_STATUS
+print_memory_map(void) {
+  EFI_MEMORY_DESCRIPTOR *buf;
+  UINTN desc_size;
+  UINT32 desc_version;
+  UINTN size, map_key, mapping_size;
+  EFI_MEMORY_DESCRIPTOR *desc;
+  EFI_STATUS err = EFI_SUCCESS;
+  int i = 0;
+
+  err = memory_map(&buf, &size, &map_key, &desc_size, &desc_version);
+  if (err != EFI_SUCCESS)
+    return err;
+
+  Print(L"Memory Map Size: %d\n", size);
+  Print(L"Map Key: %d\n", map_key);
+  Print(L"Descriptor Version: %d\n", desc_version);
+  Print(L"Descriptor Size: %d\n\n", desc_size);
+
+  global_env->uefi_mmap_original.nBytes = size;
+  global_env->uefi_mmap_original.buffer = buf;
+  global_env->uefi_mmap_original.mapKey = map_key;
+  global_env->uefi_mmap_original.descriptor_size = desc_size;
+  global_env->uefi_mmap_original.descriptor_version = desc_version;
+
+  desc = buf;
+  while ((void *) desc < (void *) buf + size) {
+    mapping_size = desc->NumberOfPages * PAGE_SIZE;
+    Print(L"[#%02d] Type: %s  Attr: 0x%x\n", i, memory_type_to_str(desc->Type), desc->Attribute);
+    Print(L"      Phys: %016llx-%016llx\n", desc->PhysicalStart, desc->PhysicalStart + mapping_size);
+    Print(L"      Virt: %016llx-%016llx\n\n", desc->VirtualStart, desc->VirtualStart + mapping_size);
+    desc = NextMemoryDescriptor(desc, desc_size);
+    i++;
   }
 
-  return EFI_SUCCESS;
+  // uefi_call_wrapper(BS->FreePool, 1, buf);
+  return err;
 }
 
-__attribute__((naked)) void unknown_handler() {
-
+void setup_uefi() {
+  print_memory_map();
 }
 
-__attribute__((naked)) void int8_handler() {
+void find_page_table() {
 
 }
 

@@ -1,9 +1,20 @@
 #pragma once
 #include "util.h"
 
+static uint64_t next_alloc_page = 0;
+
+typedef struct uefi_mmap {
+  uint64_t nBytes;
+  EFI_MEMORY_DESCRIPTOR *buffer;
+  uint64_t mapKey;
+  uint64_t descriptor_size;
+  uint32_t descriptor_version;
+} uefi_mmap;
 typedef struct {
   EFI_SYSTEM_TABLE *st;
+  uefi_mmap uefi_mmap_original;
 } environment;
+
 static environment *global_env;
 
 void g_print(CHAR16 *str, ...);
@@ -11,6 +22,8 @@ void clean_log_cache();
 
 EFI_STATUS init_interrupts();
 void find_acpi2();
+void setup_uefi();
+void find_page_table();
 
 struct IDT {
   uint16_t limit;
@@ -33,5 +46,34 @@ struct IDTDescriptor {
   uint32_t zero;     // reserved
 } __attribute__((packed));
 typedef struct IDTDescriptor IDTDescriptor;
+
+#pragma pack (1)
+struct gdt_entry {
+  uint16_t limit15_0;
+  uint16_t base15_0;
+  uint8_t base23_16;
+  uint8_t type;
+  uint8_t limit19_16_and_flags;
+  uint8_t base31_24;
+};
+
+struct tss {
+  uint32_t reserved0;
+  uint64_t rsp0;
+  uint64_t rsp1;
+  uint64_t rsp2;
+  uint64_t reserved1;
+  uint64_t ist1;
+  uint64_t ist2;
+  uint64_t ist3;
+  uint64_t ist4;
+  uint64_t ist5;
+  uint64_t ist6;
+  uint64_t ist7;
+  uint64_t reserved2;
+  uint16_t reserved3;
+  uint16_t iopb_offset;
+} tss;
+#pragma pack ()
 
 void g_print(CHAR16 *str, ...);

@@ -20,6 +20,8 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   g_print(L"This is second line");
   g_print(L".\r\n");
   find_acpi2();
+  setup_uefi();
+  find_page_table();
   clean_log_cache();
 
   UINTN Event;
@@ -29,5 +31,5 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   // If running in debug mode, use the EFI shut down call to close QEMU
   uefi_call_wrapper(global_env->st->RuntimeServices->ResetSystem, 4, EfiResetShutdown, EFI_SUCCESS, 0, NULL);
 #endif
-  return Status;
+  return 0;
 }
