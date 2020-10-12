@@ -132,7 +132,7 @@ void find_acpi2() {
   }
 }
 
-EFI_STATUS memory_map(EFI_MEMORY_DESCRIPTOR **map_buf,
+static EFI_STATUS memory_map(EFI_MEMORY_DESCRIPTOR **map_buf,
                       UINTN *map_size,
                       UINTN *map_key,
                       UINTN *desc_size,
@@ -158,47 +158,35 @@ EFI_STATUS memory_map(EFI_MEMORY_DESCRIPTOR **map_buf,
   return err;
 }
 
-EFI_STATUS
-print_memory_map(void) {
-  EFI_MEMORY_DESCRIPTOR *buf;
-  UINTN desc_size;
-  UINT32 desc_version;
-  UINTN size, map_key, mapping_size;
-  EFI_MEMORY_DESCRIPTOR *desc;
-  EFI_STATUS err = EFI_SUCCESS;
-  int i = 0;
-
-  err = memory_map(&buf, &size, &map_key, &desc_size, &desc_version);
-  if (err != EFI_SUCCESS)
-    return err;
-
-  Print(L"Memory Map Size: %d\n", size);
-  Print(L"Map Key: %d\n", map_key);
-  Print(L"Descriptor Version: %d\n", desc_version);
-  Print(L"Descriptor Size: %d\n\n", desc_size);
-
-  global_env->uefi_mmap_original.nBytes = size;
-  global_env->uefi_mmap_original.buffer = buf;
-  global_env->uefi_mmap_original.mapKey = map_key;
-  global_env->uefi_mmap_original.descriptor_size = desc_size;
-  global_env->uefi_mmap_original.descriptor_version = desc_version;
-
-  desc = buf;
-  while ((void *) desc < (void *) buf + size) {
-    mapping_size = desc->NumberOfPages * PAGE_SIZE;
-    Print(L"[#%02d] Type: %s  Attr: 0x%x\n", i, memory_type_to_str(desc->Type), desc->Attribute);
-    Print(L"      Phys: %016llx-%016llx\n", desc->PhysicalStart, desc->PhysicalStart + mapping_size);
-    Print(L"      Virt: %016llx-%016llx\n\n", desc->VirtualStart, desc->VirtualStart + mapping_size);
-    desc = NextMemoryDescriptor(desc, desc_size);
+static void print_memory_map() {
+  Print(L"Memory Map Size: %d\r\n", global_env->uefi_mmap_original.nBytes);
+  Print(L"Map Key: %d\r\n", global_env->uefi_mmap_original.mapKey);
+  Print(L"Descriptor Version: %d\r\n", global_env->uefi_mmap_original.descriptor_version);
+  Print(L"Descriptor Size: %d\r\n\r\n", global_env->uefi_mmap_original.descriptor_size);
+  EFI_MEMORY_DESCRIPTOR *desc = global_env->uefi_mmap_original.buffer;
+  uint64_t i = 0;
+  while ((void *) desc < (void *) global_env->uefi_mmap_original.buffer + global_env->uefi_mmap_original.nBytes) {
+    uint64_t mapping_size = desc->NumberOfPages * PAGE_SIZE;
+    Print(L"[#%02d] Type: %s  Attr: 0x%x\r\n", i, memory_type_to_str(desc->Type), desc->Attribute);
+    Print(L"      Phys: %016llx-%016llx\r\n", desc->PhysicalStart, desc->PhysicalStart + mapping_size);
+    Print(L"      Virt: %016llx-%016llx\r\n\r\n", desc->VirtualStart, desc->VirtualStart + mapping_size);
+    desc = NextMemoryDescriptor(desc, global_env->uefi_mmap_original.descriptor_size);
     i++;
   }
-
-  // uefi_call_wrapper(BS->FreePool, 1, buf);
-  return err;
 }
 
 void setup_uefi() {
+  EFI_STATUS status = memory_map(&global_env->uefi_mmap_original.buffer,
+                                 &global_env->uefi_mmap_original.nBytes,
+                                 &global_env->uefi_mmap_original.mapKey,
+                                 &global_env->uefi_mmap_original.descriptor_size,
+                                 &global_env->uefi_mmap_original.descriptor_version);
+  if (EFI_ERROR(status)) {
+    g_print(L"unexpected error\r\n");
+  }
+#if defined(_DEBUG)
   print_memory_map();
+#endif
 }
 
 void find_page_table() {

@@ -10,6 +10,7 @@ typedef struct uefi_mmap {
   uint64_t descriptor_size;
   uint32_t descriptor_version;
 } uefi_mmap;
+
 typedef struct {
   EFI_SYSTEM_TABLE *st;
   uefi_mmap uefi_mmap_original;
