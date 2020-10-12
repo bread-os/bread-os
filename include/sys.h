@@ -1,7 +1,7 @@
 #pragma once
 #include "util.h"
 
-static uint64_t next_alloc_page = 0;
+// static uint64_t next_alloc_page = 0;
 
 typedef struct uefi_mmap {
   uint64_t nBytes;
@@ -17,14 +17,6 @@ typedef struct {
 } environment;
 
 static environment *global_env;
-
-void g_print(CHAR16 *str, ...);
-void clean_log_cache();
-
-EFI_STATUS init_interrupts();
-void find_acpi2();
-void setup_uefi();
-void find_page_table();
 
 struct IDT {
   uint16_t limit;
@@ -75,6 +67,46 @@ struct tss {
   uint16_t reserved3;
   uint16_t iopb_offset;
 } tss;
+
+__attribute__((aligned(4096)))
+struct {
+  struct gdt_entry null;
+  struct gdt_entry kernel_code;
+  struct gdt_entry kernel_data;
+  struct gdt_entry null2;
+  struct gdt_entry user_data;
+  struct gdt_entry user_code;
+  struct gdt_entry ovmf_data;
+  struct gdt_entry ovmf_code;
+  struct gdt_entry tss_low;
+  struct gdt_entry tss_high;
+} gdt_table = {
+    {0, 0, 0, 0x00, 0x00, 0},  /* 0x00 null  */
+    {0, 0, 0, 0x9a, 0xa0, 0},  /* 0x08 kernel code (kernel base selector) */
+    {0, 0, 0, 0x92, 0xa0, 0},  /* 0x10 kernel data */
+    {0, 0, 0, 0x00, 0x00, 0},  /* 0x18 null (user base selector) */
+    {0, 0, 0, 0x92, 0xa0, 0},  /* 0x20 user data */
+    {0, 0, 0, 0x9a, 0xa0, 0},  /* 0x28 user code */
+    {0, 0, 0, 0x92, 0xa0, 0},  /* 0x30 ovmf data */
+    {0, 0, 0, 0x9a, 0xa0, 0},  /* 0x38 ovmf code */
+    {0, 0, 0, 0x89, 0xa0, 0},  /* 0x40 tss low */
+    {0, 0, 0, 0x00, 0x00, 0},  /* 0x48 tss high */
+};
+
+typedef struct table_ptr {
+  uint16_t limit;
+  uint64_t base;
+} table_ptr;
 #pragma pack ()
+
+void g_print(CHAR16 *str, ...);
+void clean_log_cache();
+
+void init_interrupts();
+void find_acpi2();
+void setup_uefi();
+
+void load_gdt(table_ptr *gdt_ptr);
+void setup_gdt();
 
 void g_print(CHAR16 *str, ...);

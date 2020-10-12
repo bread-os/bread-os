@@ -133,10 +133,10 @@ void find_acpi2() {
 }
 
 static EFI_STATUS memory_map(EFI_MEMORY_DESCRIPTOR **map_buf,
-                      UINTN *map_size,
-                      UINTN *map_key,
-                      UINTN *desc_size,
-                      UINT32 *desc_version) {
+                             UINTN *map_size,
+                             UINTN *map_key,
+                             UINTN *desc_size,
+                             UINT32 *desc_version) {
   EFI_STATUS err = EFI_SUCCESS;
   *map_size = sizeof(**map_buf) * 31;
   get_map:
@@ -189,8 +189,14 @@ void setup_uefi() {
 #endif
 }
 
-void find_page_table() {
+void load_gdt(table_ptr *gdt_ptr) {
+  // todo
+  // http://lxr.linux.no/linux+v3.13.5/arch/x86/boot/compressed/eboot.c#L857
+  asm volatile ("lgdt %0" : : "m" (*gdt_ptr));
+}
 
+void setup_gdt() {
+  // todo
 }
 
 #undef CHECK_POS

@@ -11,7 +11,6 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
 #if defined(_GNU_EFI)
   InitializeLib(ImageHandle, SystemTable);
 #endif
-  EFI_STATUS Status;
 
   uefi_call_wrapper(global_env->st->ConOut->Reset, 2, global_env->st->ConOut, FALSE);
   g_print(L"OS name: %s\r\n", os_name);
@@ -21,7 +20,6 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable) {
   g_print(L".\r\n");
   find_acpi2();
   setup_uefi();
-  find_page_table();
   clean_log_cache();
 
   UINTN Event;
