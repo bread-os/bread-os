@@ -47,7 +47,6 @@ LDFLAGS        	+= -L$(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib -e $(EP_PREFIX)efi_main
 LDFLAGS        	+= -s -Wl,-Bsymbolic -nostdlib -shared
 LIBS            = -lefi $(CRT0_LIBS)
 KERNEL_FILES	= kernel/sys.c
-KERNEL_FILES 	+= kernel/vmem_map.c
 KERNEL_FILES 	+= kernel/util.c
 
 OBJS=$(KERNEL_FILES:.c=.o)
