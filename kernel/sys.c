@@ -1,5 +1,31 @@
 #include "sys.h"
 #include "util.h"
+#pragma pack (1)
+__attribute__((aligned(4096)))
+struct {
+  struct gdt_entry null;
+  struct gdt_entry kernel_code;
+  struct gdt_entry kernel_data;
+  struct gdt_entry null2;
+  struct gdt_entry user_data;
+  struct gdt_entry user_code;
+  struct gdt_entry ovmf_data;
+  struct gdt_entry ovmf_code;
+  struct gdt_entry tss_low;
+  struct gdt_entry tss_high;
+} gdt_table = {
+    {0, 0, 0, 0x00, 0x00, 0},  /* 0x00 null  */
+    {0, 0, 0, 0x9a, 0xa0, 0},  /* 0x08 kernel code (kernel base selector) */
+    {0, 0, 0, 0x92, 0xa0, 0},  /* 0x10 kernel data */
+    {0, 0, 0, 0x00, 0x00, 0},  /* 0x18 null (user base selector) */
+    {0, 0, 0, 0x92, 0xa0, 0},  /* 0x20 user data */
+    {0, 0, 0, 0x9a, 0xa0, 0},  /* 0x28 user code */
+    {0, 0, 0, 0x92, 0xa0, 0},  /* 0x30 ovmf data */
+    {0, 0, 0, 0x9a, 0xa0, 0},  /* 0x38 ovmf code */
+    {0, 0, 0, 0x89, 0xa0, 0},  /* 0x40 tss low */
+    {0, 0, 0, 0x00, 0x00, 0},  /* 0x48 tss high */
+};
+#pragma pack()
 
 static const CHAR16 hex[] = {
     u'0', u'1', u'2', u'3', u'4', u'5', u'6', u'7',
@@ -190,8 +216,7 @@ void setup_uefi() {
 }
 
 void load_gdt(table_ptr *gdt_ptr) {
-  // todo
-  // http://lxr.linux.no/linux+v3.13.5/arch/x86/boot/compressed/eboot.c#L857
+  asm volatile("cli");
   asm volatile ("lgdt %0" : : "m" (*gdt_ptr));
 }
 
