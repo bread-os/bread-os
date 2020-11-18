@@ -1,7 +1,7 @@
 #pragma once
 #include <efi.h>
 #include <efilib.h>
-#include <stdint-gcc.h>
+#include <elf.h>
 #define UEFI_MMAP_SIZE 0x4000
 #define PAGE_SIZE 4096
 

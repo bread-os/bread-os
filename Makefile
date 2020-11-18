@@ -20,13 +20,6 @@ FW_ZIP          = $(FW_BASE)-$(FW_ARCH).zip
 GNUEFI_DIR      = $(CURDIR)/deps/gnu-efi
 GNUEFI_LIBS     = lib
 
-# If the compiler produces an elf binary, we need to fiddle with a PE crt0
-ifneq ($(CRT0_LIBS),)
-  CRT0_DIR      = $(GNUEFI_DIR)/$(GNUEFI_ARCH)/gnuefi
-  LDFLAGS      += -L$(CRT0_DIR) -T $(GNUEFI_DIR)/gnuefi/elf_$(GNUEFI_ARCH)_efi.lds $(CRT0_DIR)/crt0-efi-$(GNUEFI_ARCH).o
-  GNUEFI_LIBS  += gnuefi
-endif
-
 # SYSTEMROOT is only defined on Windows systems
 ifneq ($(SYSTEMROOT),)
   QEMU          = "/c/Program Files/qemu/qemu-system-$(QEMU_ARCH)w.exe"
@@ -38,14 +31,18 @@ else
 endif
 
 CC             	:= $(CROSS_COMPILE)gcc
+LD				:= $(GCC_ARCH)-linux-gnu-ld
 OBJCOPY        	:= $(CROSS_COMPILE)objcopy
-CFLAGS         	+= -fno-stack-protector -Wshadow -Wall -Wunused -Werror-implicit-function-declaration
+CFLAGS         	+= -fno-stack-protector -ffreestanding -Wshadow -Wall -Wunused -Werror-implicit-function-declaration
 CFLAGS         	+= -I$(GNUEFI_DIR)/inc -I$(GNUEFI_DIR)/inc/$(GNUEFI_ARCH) -I$(GNUEFI_DIR)/inc/protocol
 CFLAGS			+= -I$(CURDIR)/include
+CFLAGS			+= -I/usr/include/x86_64-linux-gnu
+CFLAGS    		+= -I/usr/include
 CFLAGS         	+= -DCONFIG_$(GNUEFI_ARCH) -D__MAKEWITH_GNUEFI -DGNU_EFI_USE_MS_ABI
-LDFLAGS        	+= -L$(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib -e $(EP_PREFIX)efi_main
+LDFLAGS        	+= -L$(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib
 LDFLAGS        	+= -s -Wl,-Bsymbolic -nostdlib -shared
 LIBS            = -lefi $(CRT0_LIBS)
+
 KERNEL_FILES	= kernel/sys.c
 KERNEL_FILES 	+= kernel/util.c
 
@@ -80,32 +77,48 @@ all: $(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib/libefi.a main.efi
 $(GNUEFI_DIR)/$(GNUEFI_ARCH)/lib/libefi.a:
 	$(MAKE) -C$(GNUEFI_DIR) CROSS_COMPILE=$(CROSS_COMPILE) ARCH=$(GNUEFI_ARCH) $(GNUEFI_LIBS)
 
+kernel: kernel/main.elf $(OBJS)
+
+kernel/main.elf: kernel/main.o
+	@echo  [LD]  $(notdir $@)
+	$(LD) -T lds/kernel.ld -m elf_x86_64 $< -o $@
+
+main.efi: $(OBJS)
+main.efi: LDFLAGS+=-e $(EP_PREFIX)efi_main
+	# If the compiler produces an elf binary, we need to fiddle with a PE crt0
+ifneq ($(CRT0_LIBS),)
+  	CRT0_DIR      = $(GNUEFI_DIR)/$(GNUEFI_ARCH)/gnuefi
+  	LDFLAGS      += -L$(CRT0_DIR) -T $(GNUEFI_DIR)/gnuefi/elf_$(GNUEFI_ARCH)_efi.lds $(CRT0_DIR)/crt0-efi-$(GNUEFI_ARCH).o
+  	GNUEFI_LIBS  += gnuefi
+endif
+
 %.efi: %.o
 	@echo  [LD]  $(notdir $@)
 ifeq ($(CRT0_LIBS),)
-	@$(CC) $(LDFLAGS) $< -o $@ $(LIBS)
+	$(CC) $(LDFLAGS) $< -o $@ $(LIBS)
 else
-	@$(CC) $(LDFLAGS) $< -o $*.elf $(LIBS)
-	@$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel* \
+	$(CC) $(LDFLAGS) $< -o $*.elf $(LIBS)
+	$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel* \
 	            -j .rela* -j .reloc -j .eh_frame -O binary $*.elf $@
-	@rm -f $*.elf
+	rm -f $*.elf
 endif
 
 debug: CFLAGS += -D_DEBUG
 debug: main.efi
 
-main.efi: $(OBJS)
-
 %.o: %.c
 	@echo  [CC]  $(notdir $@)
-	$(CC) $(CFLAGS) -ffreestanding -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
-qemu: CFLAGS += -D_DEBUG
-qemu: all $(FW_BASE)_$(FW_ARCH).fd image/efi/boot/boot$(ARCH).efi
-	@$(PYTHON) $(CURDIR)/build/start-qemu.py
+qemu: debug $(FW_BASE)_$(FW_ARCH).fd image/efi/boot/boot$(ARCH).efi image/kernel.elf
+	$(PYTHON) $(CURDIR)/build/start-qemu.py
 
-image: all $(FW_BASE)_$(FW_ARCH).fd image/efi/boot/boot$(ARCH).efi
+image: all $(FW_BASE)_$(FW_ARCH).fd image/efi/boot/boot$(ARCH).efi image/kernel.elf
 	@$(sh) build/make-img.sh
+
+image/kernel.elf: kernel/main.elf
+	mkdir -p image
+	cp -f $< $@
 
 image/efi/boot/boot$(ARCH).efi: main.efi
 	mkdir -p image/efi/boot
@@ -115,7 +128,7 @@ $(FW_BASE)_$(FW_ARCH).fd:
 	mv $(OVMF_PATH)/OVMF.fd $(CURDIR)/OVMF_X64.fd
 
 clean:
-	rm -f main.efi *.o kernel/*.o
+	rm -f main.efi *.o kernel/*.o kernel/main.efi
 	rm -rf image
 
 superclean: clean

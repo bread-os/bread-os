@@ -21,6 +21,8 @@ font/font.o
 # nasm list file
 *.lst
 
+kernel/*.elf
+
 # configuration
 .idea
 .vscode

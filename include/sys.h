@@ -12,6 +12,7 @@ typedef struct uefi_mmap {
 } uefi_mmap;
 
 typedef struct {
+  EFI_HANDLE handle;
   EFI_SYSTEM_TABLE *st;
   uefi_mmap uefi_mmap_original;
 } environment;
