@@ -4,3 +4,9 @@
 [submodule "deps/gnu-efi"]
 	path = deps/gnu-efi
 	url = git://git.code.sf.net/p/gnu-efi/code
+[submodule "kernel"]
+	path = kernel
+	url = https://github.com/bread-os/kernel.git
+[submodule "LoaderPkg"]
+	path = LoaderPkg
+	url = https://github.com/bread-os/bootloader.git
